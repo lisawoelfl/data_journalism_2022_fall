@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Consider this a personal guide to the commands and functions you will learn. In general, when you come across an R command or function that you want to remember, put it in here along with a description of what it does and when you'd use it.
 
 
-## Things I Learned on Jan. 27
+## Things I Learned on Sept.19
 
 The command to set a working directory is setwd(). For example:
 
@@ -31,6 +31,60 @@ setwd("~/Documents/GitHub/data_journalism_2022_spring")
 ```{r}
 install.packages("tidyverse")
 library(tidyverse)
+```
+
+### Interesting packages
+
+Lubridate - this package makes it easier to work with dates and times.
+
+### How to make a new column that calculates percentages
+
+```{r}
+# better ordering?
+primary_18 %>%
+  select(office, district, name_raw, party, jurisdiction, election_day, votes) %>% 
+  mutate(
+  percent_election_day = (election_day/votes)*100
+)  %>% arrange(desc(percent_election_day))
+```
+
+### How to standardize spellings in my data
+
+```{r}
+standardized_maryland_cities <- maryland_cities %>%
+  mutate(
+    upper_city = str_to_upper(city)
+)
+```
+
+### How to use "case when"
+
+```{r}
+maryland_winred_categories <- maryland_winred %>%
+  mutate(
+    amount_category = case_when(
+        amount < 100 ~ "Less than $100",
+        amount >= 100 & amount <= 500 ~ "Between $100 and $500",
+        amount > 500 & amount <= 2900 ~ "Between $501 and $2900",
+        amount > 2900 ~ "More than $2,900"
+      )
+  )
+head(maryland_winred_categories)
+```
+
+### How to filter data/get rid of data
+
+```{r}
+selected_prince_georges <- prince_georges %>% select(office, district, name_raw, party, votes)
+
+head(selected_prince_georges)
+```
+
+
+```{r}
+maryland_expenses <- maryland_expenses %>% mutate(expenditure_date=mdy(expenditure_date))
+
+head(maryland_expenses)
 ```
 
 
