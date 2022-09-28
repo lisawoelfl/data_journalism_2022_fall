@@ -91,7 +91,7 @@ glimpse(texas_precinct_20)
 
 ### Task 7: Examine the franchise column for missing values.
 **Task** Run the following codeblock to group by mail votes, count the number of precinct results, then sort from highest to lowest on count. How many results are there where mail is NA? What's the implication there? Answer below.
-**Answer**: 
+**Answer**: I'm getting an error message, "couldn't find function " %>% ""
 
 ```{r}
 
