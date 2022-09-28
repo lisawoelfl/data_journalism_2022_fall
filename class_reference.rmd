@@ -87,10 +87,101 @@ maryland_expenses <- maryland_expenses %>% mutate(expenditure_date=mdy(expenditu
 head(maryland_expenses)
 ```
 
+### Mutate - Change data type to numeric
+
+```{r}
+texas_precinct_20 <- texas_precinct_20 %>%
+  mutate(election_day = case_when(
+    election_day == '5+' ~ '49',
+    TRUE ~ election_day
+  ))
+
+texas_precinct_20 <- texas_precinct_20 %>% mutate(election_day = as.numeric(election_day))
+
+glimpse(texas_precinct_20)
+```
+
+### Clean data, clean dates
+
+```{r}
+# cleaning function
+cleaned_conowingo <- conowingo %>%
+  clean_names()
+
+# display the cleaned dataset
+cleaned_conowingo
+```
+
+### Rename column
+
+```{r}
+cleaned_conowingo <- conowingo %>%
+  clean_names() %>% 
+  rename(linenumber = x1_linenumber)
+
+# display the cleaned dataset
+cleaned_conowingo
+```
+
+### Get rid of duplicates
+
+```{r}
+# cleaning function
+cleaned_conowingo <- conowingo %>%
+  clean_names() %>% 
+  rename(linenumber = x1_linenumber) %>% 
+  mutate(amount = as.numeric(amount)) %>% 
+  distinct()
+  
+
+# display the cleaned dataset
+cleaned_conowingo
+
+```
+
+### Standardize Capitalization
+
+```{r}
+# cleaning function
+cleaned_conowingo <- conowingo %>%
+  clean_names() %>% 
+  rename(linenumber = x1_linenumber) %>% 
+  mutate(amount = as.numeric(amount)) %>% 
+  distinct() %>%
+  mutate(zip = str_sub(zip, start=1L, end=5L)) %>%
+  mutate(city = str_to_title(city))
+  
+
+# display the cleaned dataset
+cleaned_conowingo
+
+```
+
+### Detect and correct misspelllings
+
+```{r}
+# cleaning function
+cleaned_conowingo <- conowingo %>%
+  clean_names() %>% 
+  rename(linenumber = x1_linenumber) %>% 
+  mutate(amount = as.numeric(amount)) %>% 
+  distinct() %>%
+  mutate(zip = str_sub(zip, start=1L, end=5L)) %>%
+  mutate(city = str_to_title(city)) %>%
+  mutate(city = case_when(
+    str_detect(city,"^Conowing") ~ "Conowingo",
+    TRUE ~ city
+  ))
+  
+
+# display the cleaned dataset
+cleaned_conowingo
+
+```
 
 ### Summarizing
 
-I need to use group_by and summariz. Here's an example of grouping by county and calculating counts, sum and other descriptive statistics.
+I need to use group_by and summarize. Here's an example of grouping by county and calculating counts, sum and other descriptive statistics.
 
 
 ```{r}

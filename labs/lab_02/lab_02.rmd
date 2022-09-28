@@ -50,9 +50,9 @@ wv_winred_categories <- wv_winred_contribs %>%
         amount < 10 ~ "Less than $10",
         amount >= 10 & amount <= 25 ~ "Between $10 and $25",
         amount > 26 & amount <= 50 ~ "Between $26 and $50",
-        amount > 51 & amount <= 100 ~ "Between $51 and $100",
-        amount > 101 & amount <= 500 ~ "Between $101 and $500",
-        amount >= 501 ~ "$501 and up"
+        amount > 50 & amount <= 100 ~ "Between $51 and $100",
+        amount > 100 & amount <= 500 ~ "Between $101 and $500",
+        amount > 500 ~ "$501 and up"
       )
   )
 head(wv_winred_categories)
@@ -63,9 +63,13 @@ A2. Betty Bender
 
 
 ```{r}
-less_than_ten_contribs <- wv_winred_categories %>% filter(amount_category == "Less than $10")
+less_than_10 <- wv_winred_contribs %>% filter(amount < 10)
 
-head(less_than_ten_contribs)
+less_than_10 %>%
+  group_by(first_name, last_name) %>% 
+  summarise(number_of_contributions = n()) %>% 
+  arrange(desc(number_of_contributions))
+
 ```
 
 Q3. What questions do the results of Q2 raise in your mind? How could you use the data to explore them? No code here, just your questions.
@@ -78,15 +82,15 @@ A4. April
 wv_winred_contribs %>%
   mutate(month = floor_date(date, "month")) %>%
   group_by(month) %>%
-  summarise(total_amount = sum(amount)) %>%
-  arrange(desc(total_amount))
+  summarise(total = n()) %>%
+  arrange(desc(total))
 ```
 
 Q5. How many contributions of $2,900 - the individual maximum donation - were there, and who did they go to? How many of the recipients are from West Virginia? Do some googling to find out.
 A5. 6 contributions of $2,900 - they went to Congresswoman Carol Miller (WV), Steven Pallazo (Mississippi), Ryan Zinke (Montana), David McKinley (West Virginia) - we have 2 candidates.
 
 ```{r}
-max_contribs <- wv_winred_categories %>% filter(amount == 2900)
-
-head(max_contribs)
+max_contribs <- wv_winred_categories %>% 
+  filter(amount == 2900) %>% 
+  arrange (date)
 ```
