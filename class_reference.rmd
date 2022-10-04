@@ -198,3 +198,17 @@ ppp_maryland_loans %>%
   arrange(desc(max_loan_amount))
 ```
 
+
+### Bind rows / combine rows
+
+```{r}
+# bind_rows with list
+county_voters_combined <- bind_rows(list(county_voters_2016, county_voters_2018, county_voters_2020))
+View(county_voters_combined)
+```
+
+### Assign joined data to new dataframe
+
+```{r}
+maryland_population_with_voters <- maryland_population %>% left_join(county_voters_2020)
+```
