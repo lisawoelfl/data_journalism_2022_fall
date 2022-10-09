@@ -22,7 +22,7 @@ options(scipen=999)
 
 ## Getting Started
 
-This week we'll be combining and joining data to make it more useful and to ask some questions about it. We'll use Maryland 2022 primary precinct election results to do this, and our main question will be this: Which precincts had the most votes cast at them statewide, counting both the Republican and Democratic primaries? To answer this question, we'll need to first combine the two parties' primary precinct results into a single dataframe and then join it to data that has more information about each voting location.
+This week we'll be combining and joining data to make it more useful and to ask some questions about it. We'll use Maryland 2022 primary precinct election results to do this, and our main question will be this: Which precincts had the most votes cast at them statewide, counting both the Republican and Democratic  primaries? To answer this question, we'll need to first combine the two parties' primary precinct results into a single dataframe and then join it to data that has more information about each voting location.
 
 First, load the two precinct results CSV files in the `data` folder, one each for the Democratic and Republican primaries, and then combine them into a single dataframe using the method we used in the pre_lab. You'll need to clean up the column names to make the data easier to work with - make sure you have loaded the library to do that.
 
