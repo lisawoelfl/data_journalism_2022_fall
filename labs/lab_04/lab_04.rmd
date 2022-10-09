@@ -104,19 +104,19 @@ Q2. Write code to produce a `votes` column which is the result of adding togethe
 
 Then, separately write code to show each county and precinct and calculate the total votes in the Governor's race - bearing in mind that each precinct will have multiple rows in the dataframe, but you only want to see one row for each precinct. What is the name and voting location of the precinct that saw the most votes in the governor's race? 
 
-A2. I'm lost on trying to figure out how to add the filter to the code, so my answer is precinct 5002 in Montgomery County for the most votes - BUT those include votes for all types, unfortunately. For the sake of the lab, I must continue with my faulty table.
+A2. Prince George's County, Dr. Henry A. Wise, Jr High School had the most votes, 2396.
 
 ```{r}
 total_votes <- combined_location_results %>% 
   mutate(total_votes = early_votes+election_night_votes+mail_in_ballot_1_votes+mail_in_ballot_2_votes+provisional_votes)
 
-total_votes %>% 
-  group_by(county_name, election_district_precinct) %>%
-  summarise(total_votes=n()) %>%
+gov_total_votes <- total_votes %>% 
+  group_by(county_name, location_name, election_district_precinct, party) %>%
+  filter(office_name =="Governor / Lt. Governor") %>% 
+  summarise(total_votes = sum(election_night_votes, early_votes, provisional_votes, mail_in_ballot_1_votes, mail_in_ballot_2_votes)) %>%
   arrange(desc(total_votes))
 
-total_votes
-  
+gov_total_votes
 ```
 
 Q3. Let's look at the average number of votes in each party's primary race for governor. Take the code you wrote for the last part of Q2, save the results to a new variable and then find the precincts with 0 total votes for governor. How many precincts are there, and which county has the most? What else would you need to know about these precincts to know whether this might be worth a story?
@@ -125,20 +125,34 @@ Finally, write code to calculate the average and median number of total votes ac
 
 Take a look at the the Annotated Code of Maryland's election laws (https://mgaleg.maryland.gov/2023RS/Statute_Web/gel/gel.pdf) - can you find a limit on the number of voters assigned to a precinct? How might your answer impact wait times to vote?
 
-A3. 
+A3. 89 precincts have 0 votes in the governor's race. Prince George's County has the most precincts with zero votes. I would need to know how many people are eligible to vote in those precincts.
+
+```{r}
+gov_total_votes %>% 
+  filter(total_votes==0)
+```
+
+```{r}
+gov_total_votes %>% 
+  group_by(party) %>% 
+  summarise(mean_gov = mean(total_votes))
+```
+
+```{r}
+gov_total_votes %>% 
+  ungroup() %>% 
+  summarise(mean_gov = mean(total_votes), median_gov = median(total_votes))
+```
+
+Q4. Choose your own adventure: I want you to come up with a question you could ask of one of the dataframes we've created for this lab. It could involve candidates, or counties or types of voting, but it cannot be a variation of a previous question (so, for example, you can't ask, "What's the average number of votes per precinct in the U.S. Senate primary?"). First write the question and then try to answer it by writing code. If you're not sure of the exact code, try googling (or ask me or Ramsay for advice) but, at a minimum, describe what you think you'd have to do to answer it and what the results would look like. That can help.
+
+A4: Which precinct has the highest number of mail-in ballots? My answer: Prince George's County's precinct Largo Community Church has the most mail-in votes.
+
 
 ```{r}
 total_votes %>% 
-  filter(total_votes=="0") %>% 
-  group_by(county_name, election_district_precinct) %>%
-  summarise(total_votes=n()) %>%
-  arrange(desc(total_votes))
-```
+  group_by(county_name, location_name, election_district_precinct) %>%
+  summarise(mail_votes = sum(mail_in_ballot_1_votes,mail_in_ballot_2_votes)) %>% 
+  arrange(desc(mail_votes))
 
-
-
-Q4. Choose your own adventure: I want you to come up with a question you could ask of one of the dataframes we've created for this lab. It could involve candidates, or counties or types of voting, but it cannot be a variation of a previous question (so, for example, you can't ask, "What's the average number of votes per precinct in the U.S. Senate primary?"). First write the question and then try to answer it by writing code. If you're not sure of the exact code, try googling (or ask me or Ramsay for advice) but, at a minimum, describe what you think you'd have to do to answer it and what the results would look like. That can help.
-A4: Put your question here.
-
-```{r}
 ```
