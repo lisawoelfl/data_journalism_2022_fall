@@ -107,8 +107,12 @@ Then, separately write code to show each county and precinct and calculate the t
 A2. Prince George's County, Dr. Henry A. Wise, Jr High School had the most votes, 2396.
 
 ```{r}
+# mutate adds votes for each candidate
+
 total_votes <- combined_location_results %>% 
   mutate(total_votes = early_votes+election_night_votes+mail_in_ballot_1_votes+mail_in_ballot_2_votes+provisional_votes)
+
+# sum adds votes for all candidates
 
 gov_total_votes <- total_votes %>% 
   group_by(county_name, location_name, election_district_precinct, party) %>%
