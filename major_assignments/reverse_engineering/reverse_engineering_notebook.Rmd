@@ -41,6 +41,8 @@ In this section, describe the source of the data, write a basic data dictionary 
 # Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
 # Clean required data and prepare for analysis if needed. 
 nonvoters_data <- read_csv("data/nonvoters_data.csv")
+
+glimpse(nonvoters_data)
 ```
 
 ## Sentences to Engineer
@@ -121,13 +123,73 @@ nonvoters_edu
 ```
 
 ### Sentence 2
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: Our survey found, for instance, that occasional voters were slightly more likely than frequent voters to have a long-term disability (8 percent vs. 5 percent), and nonvoters were even more likely to fall into this category (12 percent). Black and Hispanic voters are also more likely to experience hurdles, perhaps in part because there tend to be fewer polling places in their neighborhoods. About 24 percent of Black respondents said that they had to stand in line for more than an hour while voting, and Hispanic respondents were more likely to say they had trouble accessing the polling place or couldn’t get off work in time to vote.
+
+* **Analysis summary**: We were able to confirm the data on disability, showing that the nonvoters had the largest percentage of people receiving long-term disability. We did wonder about the data, because the survey also asked if people had any chronic illnesses. Depending on how you define disability, people who have chronic illnesses and don't receive long-term disability, should count as well. In the article itself, we think the authors should have made clear how narrow disability is defined in the data.
+
+We weren't able to replicate the second percentage, that about 24% of Black respondents said they had to stand in line for more than an hour while voting. According to our calculations, it is even higher at 27%.
 
 ```{r}
 # Put code to reverse engineer sentence here
+never_disability_voters <- nonvoters_data %>%
+  group_by(Q10_1,voter_category) %>%
+  filter(voter_category == "rarely/never") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/total_nonvoters)*100) %>%
+  arrange(desc(percent))
+
+never_disability_voters
+```
+
+```{r}
+sporadic_voters_total <- 2574
+always_voters_total <- 1811
+```
+
+
+```{r}
+# Put code to reverse engineer sentence here
+always_disability_voters <- nonvoters_data %>%
+  group_by(Q10_1,voter_category) %>%
+  filter(voter_category == "always") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/always_voters_total)*100) %>%
+arrange(desc(percent))
+
+always_disability_voters
+```
+```{r}
+# Put code to reverse engineer sentence here
+sporadic_disability_voters <- nonvoters_data %>%
+  group_by(Q10_1,voter_category) %>%
+  filter(voter_category == "sporadic") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/sporadic_voters_total)*100) %>%
+arrange(desc(percent))
+
+sporadic_disability_voters
+```
 
 # Display results of code below this codeblock
+
+```{r}
+black_voters <- nonvoters_data %>%
+  group_by(race) %>%
+  filter(race == "Black") %>%
+  summarise(count = n())
+black_voters <- 932
+```
+
+```{r}
+line_voters <- nonvoters_data %>%
+  group_by(Q18_8,race) %>%
+  filter(race == "Black") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/black_voters)*100) %>%
+arrange(desc(percent))
+
+line_voters
+```
 
 ```
 
