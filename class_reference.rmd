@@ -212,3 +212,10 @@ View(county_voters_combined)
 ```{r}
 maryland_population_with_voters <- maryland_population %>% left_join(county_voters_2020)
 ```
+
+
+### Save as CSV file
+
+```{r}
+write_csv(dataframe, "data/new_name.csv")
+```
