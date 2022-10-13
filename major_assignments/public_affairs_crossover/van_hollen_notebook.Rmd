@@ -65,6 +65,16 @@ total_donations_hollen <- receipts_hollen %>%
 
 total_donations_hollen
 ```
+
+```{r}
+totalsum_donations_hollen <- receipts_hollen %>%
+  group_by(report_year) %>% 
+  summarise(total = sum(contribution_receipt_amount))
+
+totalsum_donations_hollen
+```
+
+
 ```{r}
 count_donations_hollen <- receipts_hollen %>% 
   group_by(contributor_name) %>% 
@@ -80,73 +90,53 @@ receipts_hollen %>%
 ```
 
 
-
-
 ```{r}
-nonvoters_age <- nonvoters_categories %>%
-  group_by(ppage,voter_category) %>%
-  filter(voter_category == "rarely/never") %>%
-  summarise(count = n()) %>%
-  mutate(percent = (count/total_nonvoters)*100) %>%
-arrange(desc(percent))
-nonvoters_age
+total_disburs_hollen <- disburs_hollen %>% 
+  group_by(recipient_name) %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+
+total_disburs_hollen
 ```
 
 ```{r}
-nonvoters_edu <- nonvoters_categories %>%
-  group_by(educ,voter_category) %>%
-  filter(voter_category == "rarely/never") %>%
-  summarise(count = n()) %>%
-  mutate(percent = (count/total_nonvoters)*100) %>%
-arrange(desc(percent))
-nonvoters_edu
+indi_disburs_hollen <- disburs_hollen %>% 
+  group_by(recipient_name) %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+
+indi_disburs_hollen
 ```
 
-### Sentence 2
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
 
 ```{r}
-# Put code to reverse engineer sentence here
+count_disburs_hollen <- disburs_hollen %>% 
+  group_by(recipient_name) %>% 
+  summarise(count_disburs = n()) %>% 
+  arrange(desc(count_disburs))
 
-# Display results of code below this codeblock
-
+count_disburs_hollen
 ```
-
-### Sentence 3
-
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
 
 ```{r}
-# Put code to reverse engineer sentence here
+totalsum_disburs_hollen <- disburs_hollen %>%
+  group_by(report_year) %>% 
+  summarise(total = sum(disbursement_amount))
 
-# Display results of code below this codeblock
-
+totalsum_disburs_hollen
 ```
 
-### Sentence 4
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
 
-```{r}
-# Put code to reverse engineer sentence here
 
-# Display results of code below this codeblock
 
-```
 
-### Sentence 5
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
 
-```{r}
-# Put code to reverse engineer sentence here
 
-# Display results of code below this codeblock
 
-```
 
--30-
+
+
+
