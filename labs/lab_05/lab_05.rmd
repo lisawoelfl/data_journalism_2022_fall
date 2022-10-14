@@ -74,11 +74,13 @@ clean_media_md_expenses <- read_csv("data/clean_media_md_expenses.csv")
 ```
 
 ```{r}
-clean_media_md_expenses %>% 
+top_meta <- clean_media_md_expenses %>% 
   filter(clean_payee_name == "Meta") %>% 
   group_by(committee_name, clean_payee_name) %>% 
   summarise(total_amount = sum(amount)) %>% 
   arrange(desc(total_amount))
+
+top_meta
 ```
 
 **Q2.** Let's do some research on the top committees from question 1. Look up the top 10 spenders: if they are candidate committees, what offices were they running for? If they were not candidates, what issues do they seem to care about? Write some sentences answering those questions, then go the Facebook ad library (https://www.facebook.com/ads/library/?active_status=all&ad_type=political_and_issue_ads&country=US&sort_data[direction]=desc&sort_data[mode]=relevancy_monthly_grouped&media_type=all) and look for ads from the top spender. What do you notice about those ads? There's no code required here.
@@ -97,18 +99,50 @@ clean_media_md_expenses %>%
 
 **Q3.** Given the list of top spenders in A1 and the primary results for governor (https://elections.maryland.gov/elections/2022/primary_results/gen_results_2022_1.html), who is missing from that Q1 list? Did those campaigns run Facebook ads? Who are the biggest recipients of media expenses by the Democratic primary winner for governor (HINT: that person has two committees you should account for)?
 
+Dan Cox & Gordana Schifanelli -> no FB ads
+Robin Ficker & LeRoy F Yegge -> no FB ads 
+Kelly Schulz & Jeff Woolford -> no FB ads
+Joe Werner & Minh Than Luong -> no FB ads
+Rushern L Baker & Nancy Navarro -> no FB ads
+Douglas Gansler & Candace Hollingsworth -> no FB ads
+Ralph Jaffe & Mark Greben -> no FB ads
+Wes Moore & Aruna Miller -> no FB ads
+Tom Perez & Shannon Sneed -> no FB ads
+Jerome Segal & Justinian Dispenza -> no FB ads
+
+Wes Moore & Aruna Miller committees:
+- "Moore  Wes For Maryland"
+- "Moore Miller For Maryland Slate"
+
 **A3.** 
+Top recipient from Wes Moore's committees is the public affairs and consulting firm "SKDK". According to Wikipedia, they specialize in working for Democratic Party politicians. Politico says, SKDK is "where powerful Democrats plot the anti-Trump agenda".
 
 ```{r}
+moore_expenses <- clean_media_md_expenses %>% 
+  filter(committee_name == "Moore  Wes For Maryland" | committee_name == "Moore Miller For Maryland Slate") %>% 
+  group_by(clean_payee_name, committee_name) %>% 
+  summarise(total_amount = sum(amount)) %>% 
+  arrange(desc(total_amount))
+
+moore_expenses
 ```
 
 **Q4.** The media expense data you cleaned also has a standardized purpose column. Write code to generate a list of the committees with the total amount of spending on online advertising. How does this list compare to the one from Q1 about top Facebook spenders? Of the top 5 committees who spent the most on Facebook ads from Q1, are there any that appear to have spent *all* of their online advertising dollars on Facebook?
 
-**A4.** 
+**A4.** There is much more money going into online ads in general. Committees that spend the most money on online ads and those who spent most on Meta mostly don't overlap. The highest sum for Meta is around 60k, online ads around 570k. Ashwani Jain put all online ad dollars into Meta.
 
 ```{r}
+top_online <- clean_media_md_expenses %>% 
+  filter(expense_purpose == "Online Advertising") %>% 
+  group_by(committee_name, expense_purpose) %>% 
+  summarise(total_amount = sum(amount)) %>% 
+  arrange(desc(total_amount))
+
+top_online
 ```
 
 **Q5** You've been asked to summarize your findings about spending on Facebook by Maryland political candidates. How much do we know and what don't we know? What's the best story idea you've found here?
 
-**A5** 
+**A5** I'm surprised to find that candidates don't spend a lot of money on Facebook ads. (Most candidates in the primary for the governor's didn't advertise on Facebook at all!) I would be interested in finding out if that has changed over the last 10 years. Is Facebook less relevant than it was 5 years ago for campaigns? If committees aren't spending as much on Facebook, where else is the money going?
+
+At the same time, we know that Wes Moore spend a lot on SKDK and I can't say for sure, that the consulting firm didn't pay for Facebook ads, for example. Cost for Facebook ads could be hidden that way.

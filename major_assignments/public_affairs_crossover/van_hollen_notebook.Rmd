@@ -67,6 +67,26 @@ total_donations_hollen
 ```
 
 ```{r}
+state_donations_hollen <- receipts_hollen %>% 
+  group_by(contributor_state) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+state_donations_hollen
+```
+
+```{r}
+industry_donations_hollen <- receipts_hollen %>% 
+  group_by(contributor_occupation) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+industry_donations_hollen
+```
+
+
+
+```{r}
 totalsum_donations_hollen <- receipts_hollen %>%
   group_by(report_year) %>% 
   summarise(total = sum(contribution_receipt_amount))
@@ -87,6 +107,14 @@ count_donations_hollen
 ```{r}
 receipts_hollen %>% 
   filter(contributor_name == "PARRON-RAGLAND, DELORES L")
+```
+
+```{r}
+indi_receipts_hollen <- receipts_hollen %>% 
+  group_by(entity_type_desc) %>% 
+  summarise(total = sum(contribution_receipt_amount))
+
+indi_receipts_hollen
 ```
 
 
