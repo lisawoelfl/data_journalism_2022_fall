@@ -1,0 +1,243 @@
+---
+title: "lab_06"
+author: "derek willis"
+date: "10/18/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## You will need
+
+* Tabula
+
+## Load libraries and establish settings
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+# Load the libraries you will need
+library(tidyverse)
+library(janitor)
+```
+
+## Get Our PDF
+
+We'll be working with the [Maryland monthly voter registration update](https://elections.maryland.gov/pdf/vrar/2022_09.pdf) from the State Board of Elections. You'll want to download it to a place you'll remember (like your Downloads folder, or the labs folder in your repository). The goal is to write a couple of paragraphs that summarize the changes in voter registration in Maryland during the month of September.
+
+## Setup Tabula
+
+Start Tabula, then go to http://127.0.0.1:8080/ in your browser. Click the "Browse" button and find the PDF file and click "open", and then click the "Import button" in Tabula. This will take a few seconds.
+
+This PDF has multiple possible tables to extract. We're going to make four dataframes: new registrations by party, removals by party, changes in registration and current registrations by county. You will need to draw boxes around four sections and export four CSV files that you will load into R. In Tabula, draw a box around the borders of those tables and click the "Preview & Export Extracted Data" button for each one. The export should look pretty clean.
+
+Export each CSV (each one should be called `tabula-2022-09.csv` by default, so you should rename them for clarity) to your lab_06/data folder.
+
+From there, you will need to read in and clean up the data, and in particular the headers. You can choose to include the headers from the PDF in your exported CSV files OR to exclude them and add them when importing. `read_csv` allows us to do this ([and more](https://readr.tidyverse.org/reference/read_delim.html)).
+
+## Load and clean up the data in R
+
+You will need to read in and clean up the data so that it can be used for analysis. By "clean" I mean the column headers should not contain spaces and they should have meaningful names, not "x1" or something similar. The current registrations dataframe *MUST* include the county name, but should not include the columns under `Changes` and `Party Affiliation From`. How you do that is up to you (and could involve something outside R), but you can use select() with or without the minus sign to include or exclude certain columns. You also can use the `rename` function to, well, rename columns.
+
+```{r}
+# Party registrations
+party_reg_22 <- read_csv("data/22_registration.csv") %>% clean_names() %>% 
+rename(category = x1)
+
+party_reg_22
+```
+
+```{r}
+# Removals
+removals_22 <- read_csv("data/22_removal.csv") %>% clean_names() %>% 
+rename(reason = x1)
+
+removals_22
+```
+
+```{r}
+# Changes
+changes_22 <- read_csv("data/22_changes.csv") %>% clean_names() %>% 
+rename(county = x1)
+
+changes_22
+```
+
+```{r}
+# Current registrations
+current_reg_county_22 <- read_csv("data/22_current_reg_county.csv") %>% clean_names() %>% 
+  rename(county = x1)
+
+clean_reg_county_22 <- current_reg_county_22 %>% 
+  select(-address,-name,-dem_4,-rep_5,-grn_6,-lib_7,-wcp_8,-unaf_9,-oth_10,-total_11)
+clean_reg_county_22
+```
+
+## Rinse, Repeat: September 2020 data
+
+Do all of that again, for the [September 2020 voter registration update](https://elections.maryland.gov/pdf/vrar/2020_09.pdf), so we can compare the two. If you've done well, this is easy: just do the same steps in Tabula, export the files and use the same code to read in and clean up the data, *just remember to give these dataframes different names*, although similar enough so that you know how to compare September 2022 to September 2020.
+
+To answer the following questions, you'll need to calculate percentages and do other calculations. Whether you do that by combining or joining dataframes or you write code to run separately on both is up to you.
+
+```{r}
+# Party registrations
+party_reg_20 <- read_csv("data/20_registration.csv") %>% clean_names() %>% 
+rename(category = x1)
+
+party_reg_20
+```
+
+```{r}
+# Removals
+removals_20 <- read_csv("data/20_removal.csv") %>% clean_names() %>% 
+rename(reason = x1)
+
+removals_20
+```
+
+```{r}
+# Changes
+changes_20 <- read_csv("data/20_changes.csv") %>% clean_names() %>% 
+rename(county = x1)
+
+changes_20
+```
+
+```{r}
+# Current registrations
+current_reg_county_20 <- read_csv("data/20_current_reg_county.csv") %>% clean_names() %>% 
+  rename(county = x1)
+current_reg_county_20
+
+clean_reg_county_20 <- current_reg_county_20 %>% 
+  select(-conf_address_name,-dem_3,-rep_4,-grn_5,-lib_6,-wcp_7,-bar_8,-unaf_9,-oth_10,-total_11)
+clean_reg_county_20
+```
+
+
+## Answer questions
+
+Q1. Calculate the percentage of registered Democrats, Republicans and unaffiliated voters for the entire state in September 2022 and September 2020, and then calculate the percentage change for those three party categories (the formula for percentage change is easy to remember: (New-Old)/Old). How would you describe the changes in these partisan categories in a story? What's the most interesting thing about these changes that would be the lede of that story?
+
+A1. 
+Democrats: from 54.99 to 54.09, -1.64%
+Republicans: from 24.74 to 24.00, -2.99%
+Unaffiliated: from 18.73 to 20.22, +7.96%
+
+Democrats and Republicans lost a share of their registered voters. In 2022, almost 8% more are unaffiliated with any party than in 2020.
+
+
+```{r}
+perc_current_20 <- clean_reg_county_20 %>% 
+  slice(25) %>%
+  mutate(perc_dem = (dem_12/total_20*100)) %>% 
+  mutate(perc_rep = (rep_13/total_20*100)) %>% 
+  mutate(perc_unaf = (unaf_18/total_20*100))
+perc_current_20
+```
+```{r}
+perc_current_22 <- clean_reg_county_22 %>% 
+  slice(25) %>%
+  mutate(perc_dem = (dem_12/total_22*100)) %>% 
+  mutate(perc_rep = (rep_13/total_22*100)) %>% 
+  mutate(perc_unaf = (unaf_17/total_22*100))
+perc_current_22
+  
+```
+
+
+```{r}
+total_22 <- 4161637
+total_20 <- 4106456
+```
+
+
+Q2. Among the Maryland jurisdictions with the most registered voters, which one had the biggest percentage increase in unaffiliated voters between 2020 and 2022? How did that county vote for governor in 2018 and for president in 2020? Contrast the partisan percentages of that county with the county that had the second-largest percentage increase in unaffiliated voters. You should display information from the data that shows the counties with the largest percentage increase first.
+
+A2. Dorchester County had a +13.81% increase in unaffiliated voters from 2020 to 2022. In 2020, voted for Trump (54.9%), in 2018 the county voted for Hogan (74.4%).
+
+Kent County had the second largest increase in affiliated voters with +13.23%. At the presidential election, the race was close, with 49.4% voting for Biden and 48.1% voting for Trump. In 2018, Kent voted for Hogan (73.3%).
+
+In general, it's interesting to see that the number of unaffiliated voters rose in every single county.
+
+```{r}
+unaffiliated_20 <- clean_reg_county_20 %>% 
+  summarise(county, unaf_18)
+
+unaffiliated_22 <- clean_reg_county_22 %>% 
+  summarise(county, unaf_17)
+
+unaffiliated_22 %>%  left_join(unaffiliated_20, by="county") %>% 
+  rename(unaf_20 = unaf_18) %>% 
+  rename(unaf_22 = unaf_17) %>% 
+  mutate(perc_change = ((unaf_22-unaf_20)/unaf_20*100)) %>% 
+  arrange(desc(perc_change))
+```
+
+
+Q3. Do the party percentages of new registrants (% Dem, % Rep, % Unaffiliated) from September 2022 and September 2020 match the overall percentage of partisan registration in the state at those times?
+
+In other words, did new registrants mirror the overall partisan composition of the electorate, or were they different? Do any of the methods of registration vary significantly from the overall partisan pattern? Which method is worthy of further exploration?
+
+A3. No, people who registered to vote in 2020 were more likely to be unaffiliated than overall registered voters. In 2022, more than 30% of newly registered voters were unaffiliated. Both years see more unaffiliated than republican voters that newly registered.
+
+Registering via Eric Report went up significantly from 2020. A quick Google search shows that ERIC is a non-profit organization that states it's mission as assist people with voter registration.
+
+```{r}
+total_new_20 <- 63684
+
+perc_new_20 <- party_reg_20 %>% 
+  slice(17) %>%
+  mutate(perc_dem = (dem/total_new_20*100)) %>% 
+  mutate(perc_rep = (rep/total_new_20*100)) %>% 
+  mutate(perc_unaf = (unaf/total_new_20*100))
+perc_new_20
+```
+
+```{r}
+total_new_22 <- 37623
+
+perc_new_22<- party_reg_22 %>% 
+  slice(17) %>%
+  mutate(perc_dem = (dem/total_new_22*100)) %>% 
+  mutate(perc_rep = (rep/total_new_22*100)) %>% 
+  mutate(perc_unaf = (unaf/total_new_22*100))
+perc_new_22
+```
+
+
+Q4. Choose your own adventure! Using both the 2022 and 2020 data for one of the dataframes (changes, removals or new registrations), ask and answer a question that makes at least one comparison and requires code to answer. That could involve calculating a percentage, percentage change or the raw difference between two columns.
+
+A4. Since we talked about people moving in class, I wanted to see whose voters where more likely to leave the county (and thus be removed) compared to the share of total active voters. (Moving was by far the most common reason to be removed.)
+
+I have found that in 2020 Democrats were overrepresented (59.79% of moves vs 54.99% of active voters) and Republicans were underrepresented (17.25% of moves vs 24.74% of active voters). The same can be observed in the 2022 data.
+
+```{r}
+total_move_20 <- 18551
+
+perc_move_20 <- removals_20 %>% 
+  slice(3) %>%
+  mutate(perc_dem = (dem/total_move_20*100)) %>% 
+  mutate(perc_rep = (rep/total_move_20*100)) %>% 
+  mutate(perc_unaf = (unaf/total_move_20*100))
+perc_move_20
+
+```
+
+```{r}
+total_move_22 <- 15548
+
+perc_move_22 <- removals_22 %>% 
+  slice(3) %>%
+  mutate(perc_dem = (dem/total_move_22*100)) %>% 
+  mutate(perc_rep = (rep/total_move_22*100)) %>% 
+  mutate(perc_unaf = (unaf/total_move_22*100))
+perc_move_22
+
+```
+
+Q5. What's the best story idea or question you've seen as a result of the work you've done in this lab?
+
+A5. I would probably want to look into counties where more and more people register as unaffiliated. Who do they vote for eventually? Why don't they register with parties? Are there any commonalities between counties that see the sharpest rise in unaffiliated voters? I'm also interested in the Eric project. It managed to register a significant number of voters in 2022, although the overall number of new registration was down (unsurprisingly, as a presidential election will draw more people).
