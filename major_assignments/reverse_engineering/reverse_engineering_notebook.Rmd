@@ -274,6 +274,24 @@ always_looklike
 
 ### Sentence 5
 
+
+* **Sentence text**: Thompson thinks a lot of the problems on Election Day come down to logistical issues that could be fixed. Others agreed that there’s more the U.S. could be doing to encourage people to vote. Fifty-one percent of respondents thought that making Election Day a national holiday would allow more people to cast a ballot. Similar shares agreed that more information about the candidates from unbiased sources (51 percent) or early in-person voting (52 percent) would help, too.
+
+* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+
+
+```{r}
+# Put code to reverse engineer sentence here
+Holidays <- nonvoters_data %>% 
+  group_by(Q19_3) %>% 
+  filter(Q19_3 == "1") %>% 
+  summarise(count = n()) %>% 
+  mutate(percent = (count/Total_Respondents)*100)
+Holidays
+# Display results of code below this codeblock
+```
+
+
 * **Sentence text**: [Paste in sentence to engineer here]
 * **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
 
