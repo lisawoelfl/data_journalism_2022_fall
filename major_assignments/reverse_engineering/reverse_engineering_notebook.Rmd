@@ -1,7 +1,7 @@
 ---
 title: "Reverse Engineering Project"
-author: "Lisa Woelfl"
-date: "10/06/22"
+author: "Abby Wallace, Lisa Woelfl, Torrence Banks, Noah Ferguson"
+date: "29/10/22"
 output:
   html_document:
     theme: cerulean
@@ -34,7 +34,20 @@ library(lubridate)
 
 ## Load and Cleaning Data
 
-In this section, describe the source of the data, write a basic data dictionary for data you are working with, and discuss any caveats or issues you discovered working with this data. 
+The data came from polling done by the marketing research company Ipsos for FiveThirtyEight. The poll was conducted in Sept. 2020 among a sample of U.S. citizens that oversampled young, Black and Hispanic respondents. 
+
+The voter file company Aristotle connected participants to their voter file information to learn more about their voting history. 
+
+Respondents who were only eligible to vote in three of the elections were dropped from the data.
+
+Ultimately, the final sample used 5,836 respondents (5,239 matched the voter file, 597 who said they rarely or never voted and were eligible for at least four elections.)
+
+Almost always vote:  People who voted in all (or all but one) of the national elections (presidential and midterm) they were eligible to vote in since 2000.
+
+Vote sometimes: People who voted in at least two elections, but fewer than all the elections they were eligible to vote in (or all but one).
+
+Rarely or never vote: People who voted in no elections, or just one.
+
 
 ```{r}
 # Load required data
@@ -50,7 +63,7 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 * **Sentence text**: [Nonvoters were more likely to have lower incomes; to be young; to have lower levels of education; and to say they don’t belong to either political party, which are all traits that square with what we know about people less likely to engage with the political system.]
 
-* **Analysis summary**: I was able to verify 3 of the four likely attributes named above for nonvoters. By providing individual analyses through looking at rare/never voters and the various attributes, we calculated how many people of the sample data fit into those categories and found the total percentage of each each attribute contributes to likely nonvoters. We couldn't verify "young" which is likely due to that phrase being open for interpretation (we used the standard 18-24) and the total data did not have anyone younger than 22.
+* **Analysis summary**: We were able to verify 3 of the four likely attributes named above for nonvoters. By providing individual analyses through looking at rare/never voters and the various attributes, we calculated how many people of the sample data fit into those categories and found the total percentage of each each attribute contributes to likely nonvoters. We couldn't verify "young" which is likely due to that phrase being open for interpretation (we used the standard 18-24) and the total data did not have anyone younger than 22.
 
 ```{r}
 nonvoters_categories <- nonvoters_data %>%
