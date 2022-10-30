@@ -53,8 +53,6 @@ In this notebook, we are reverse engineering five sentences from the story.
 * **Analysis summary**: I was able to verify 3 of the four likely attributes named above for nonvoters. By providing individual analyses through looking at rare/never voters and the various attributes, we calculated how many people of the sample data fit into those categories and found the total percentage of each each attribute contributes to likely nonvoters. We couldn't verify "young" which is likely due to that phrase being open for interpretation (we used the standard 18-24) and the total data did not have anyone younger than 22.
 
 ```{r}
-# Put code to reverse engineer sentence here
-# Display results of code below this codeblock
 nonvoters_categories <- nonvoters_data %>%
   mutate(
     Q30 = case_when(
@@ -69,6 +67,7 @@ nonvoters_categories <- nonvoters_data %>%
 nonvoters_categories %>%
   summarize(income_cat, educ, Q30, voter_category, ppage)
 ```
+
 ```{r}
 nonvoters_total <- nonvoters_categories %>%
   group_by(voter_category) %>%
@@ -76,6 +75,7 @@ nonvoters_total <- nonvoters_categories %>%
   summarise(count = n())
 nonvoters_total
 ```
+
 ```{r}
 total_nonvoters <- 1451
 ```
@@ -128,7 +128,6 @@ nonvoters_edu
 We weren't able to replicate the second percentage, that about 24% of Black respondents said they had to stand in line for more than an hour while voting. According to our calculations, it is even higher at 27%. Also, the survey asks if "you or any members of your household" had to wait in line for more than 1 hour - the article doesn't differentiate.
 
 ```{r}
-# Put code to reverse engineer sentence here
 never_disability_voters <- nonvoters_data %>%
   group_by(Q10_1,voter_category) %>%
   filter(voter_category == "rarely/never") %>%
@@ -144,9 +143,7 @@ sporadic_voters_total <- 2574
 always_voters_total <- 1811
 ```
 
-
 ```{r}
-# Put code to reverse engineer sentence here
 always_disability_voters <- nonvoters_data %>%
   group_by(Q10_1,voter_category) %>%
   filter(voter_category == "always") %>%
@@ -156,8 +153,8 @@ arrange(desc(percent))
 
 always_disability_voters
 ```
+
 ```{r}
-# Put code to reverse engineer sentence here
 sporadic_disability_voters <- nonvoters_data %>%
   group_by(Q10_1,voter_category) %>%
   filter(voter_category == "sporadic") %>%
@@ -167,8 +164,6 @@ arrange(desc(percent))
 
 sporadic_disability_voters
 ```
-
-# Display results of code below this codeblock
 
 ```{r}
 black_voters <- nonvoters_data %>%
@@ -189,7 +184,6 @@ arrange(desc(percent))
 line_voters
 ```
 
-
 ### Sentence 3
 
 * **Sentence text**: For one thing, occasional voters (80 percent) and nonvoters (68 percent) are less likely to believe that politicians have an impact on their lives than consistent voters (84 percent). Similarly, people who vote sometimes (78 percent) or rarely (60 percent) are much less likely than voters who vote almost all of the time (85 percent) to say that there are people in politics who look like them — which could in turn make it harder to trust or identify with the candidates running for office.
@@ -197,7 +191,6 @@ line_voters
 * **Analysis summary**: From the question text for Q4, we assumed that respondents would be grouped as saying politicians did have an impact on their lives if they answered "A significant impact", "Somewhat of an impact" or "Just a slight impact". This produces the wrong data. Apparently the writers grouped "Just a slight impact" in with "No impact at all" - which seems questionable. Doing that we were able to get closer to the numbers in the sentence, but still didn't get the exact same values (68 vs 71 for nonvoters, for example).
 
 The text references at least 4 different voter categories (sometimes, rarely, almost all of the time, nonvoters). The data only gives us 3 categories (rarely/never, sporadic, always). We don't have a way to differentiate between people who vote sometimes and those who rarely in our dataset. Our results for people who almost always vote varies slightly (85 vs 86%). We cant' say why.
-
 
 ```{r}
 impact_looklike <- nonvoters_data %>%
@@ -218,7 +211,6 @@ nonvotes_impact <- impact_looklike %>%
 arrange(desc(percent))
 nonvotes_impact
 ```
-
 
 ```{r}
 sporadic_impact <- impact_looklike %>%
@@ -262,44 +254,107 @@ always_looklike
 
 ### Sentence 4
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: This year, some of these occasional voters are also dealing with pandemic-specific challenges that could make voting less of a priority. For instance, people who vote more irregularly are a little more likely than those who almost always vote to have lost a job in the past year (13 percent vs. 10 percent) or to have worried about expenses (21 percent vs. 16 percent), although those who almost never vote are even likelier than those who sometimes vote to have reported these experiences.
+
+* **Analysis summary**: We calculated the percentage of voters in each category that have lost their job in the past year and couldn't exactly replicate the data in the sentence. According to our calculation, 12.8% of people who vote sporadically have lost their job in the past year - which rounds up to the percentage in the sentence. It is confusing, however, that the voter group is called "people who vote more irregularly". The terms change throughout the article. We were able to reproduce the results for people who always vote as well.
+
+We then calculated the percentages of people saying they had worried about expenses according to voter category and were able to reproduce the results in the sentence for those who vote sporadically (21%). Our results for those who always vote differ slightly (15.41% vs 16%).
+
+We thought it was interesting how the sentence compares sporadic and consistent voters, but don't give specific figures for nonvoters, which is why we also calculated results for this group.
 
 ```{r}
-# Put code to reverse engineer sentence here
+never_votes_job <- nonvoters_data %>%
+  group_by(Q11_1,voter_category) %>%
+  filter(voter_category == "rarely/never") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/total_nonvoters)*100) %>%
+  arrange(desc(percent))
+never_votes_job
+```
 
-# Display results of code below this codeblock
+```{r}
+sporadic_votes_job <- nonvoters_data %>%
+  group_by(Q11_1,voter_category) %>%
+  filter(voter_category == "sporadic") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/sporadic_voters_total)*100) %>%
+  arrange(desc(percent))
+sporadic_votes_job
+```
 
+```{r}
+always_votes_job <- nonvoters_data %>%
+  group_by(Q11_1,voter_category) %>%
+  filter(voter_category == "always") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/always_voters_total)*100) %>%
+  arrange(desc(percent))
+always_votes_job
+```
+
+```{r}
+never_votes_worry <- nonvoters_data %>%
+  group_by(Q11_5,voter_category) %>%
+  filter(voter_category == "rarely/never") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/total_nonvoters)*100) %>%
+  arrange(desc(percent))
+never_votes_worry
+```
+
+```{r}
+sporadic_votes_worry <- nonvoters_data %>%
+  group_by(Q11_5,voter_category) %>%
+  filter(voter_category == "sporadic") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/sporadic_voters_total*100)) %>%
+  arrange(desc(percent))
+sporadic_votes_worry
+```
+
+```{r}
+always_votes_worry <- nonvoters_data %>%
+  group_by(Q11_5,voter_category) %>%
+  filter(voter_category == "always") %>%
+  summarise(count = n()) %>%
+  mutate(percent = (count/always_voters_total*100)) %>%
+  arrange(desc(percent))
+always_votes_worry
 ```
 
 ### Sentence 5
 
-
 * **Sentence text**: Thompson thinks a lot of the problems on Election Day come down to logistical issues that could be fixed. Others agreed that there’s more the U.S. could be doing to encourage people to vote. Fifty-one percent of respondents thought that making Election Day a national holiday would allow more people to cast a ballot. Similar shares agreed that more information about the candidates from unbiased sources (51 percent) or early in-person voting (52 percent) would help, too.
 
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
-
+* **Analysis summary**: In sentence 5, we assumed that "respondents" in this case meant the total number of people that responded to the survey without including any additional information on their race or voting status. The number of people who answered the survey was stored in the variable titled Total_Respondents. Ultimately, we were not able to get the exact results from the paragraph, as two of them were slightly off. For making Election Day a holiday, we got 52% instead of 51% and for early in-person voting, we got 53.6% instead of 52%. We were able to get 51.7% for more information on unbiased source, close to the 51% mentioned in the story. We are not sure why these numbers are slightly off.
 
 ```{r}
-# Put code to reverse engineer sentence here
+Total_Respondents <- 5836
+```
+
+```{r}
 Holidays <- nonvoters_data %>% 
   group_by(Q19_3) %>% 
   filter(Q19_3 == "1") %>% 
   summarise(count = n()) %>% 
   mutate(percent = (count/Total_Respondents)*100)
 Holidays
-# Display results of code below this codeblock
 ```
-
-
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
 
 ```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
-
+Unbiased <- nonvoters_data %>% 
+  group_by(Q19_2) %>% 
+  filter(Q19_2 == "1") %>% 
+  summarise(count = n()) %>% 
+  mutate(percent = (count/Total_Respondents)*100)
+Unbiased
 ```
 
--30-
+```{r}
+Early_inperson <- nonvoters_data %>% 
+  group_by(Q19_6) %>% 
+  filter(Q19_6 == "1") %>% 
+  summarise(count = n()) %>% 
+  mutate(percent = (count/Total_Respondents)*100)
+Early_inperson
+```
