@@ -299,4 +299,5 @@ md_winred_by_date %>%
 
 Again, this isn't as pretty as we could make it.  But by charting this, we can quickly see a pattern that can help guide our reporting. 
 
-We're just scratching the surface of what ggplot can do, and chart types. There's so much more you can do, so many other chart types you can make. But the basics we've shown here will get you started. 
+We're just scratching the surface of what ggplot can do, and chart types. There's so much more you can do, so many other chart types you can make. But the basics we've shown here will get you started.
+
