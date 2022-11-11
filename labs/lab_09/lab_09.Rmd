@@ -1,0 +1,155 @@
+---
+title: "lab_09"
+author: "Derek Willis"
+date: "11/09/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## You will need
+
+* the tidyverse, janitor and tigris libraries
+* you might choose to use the tidycensus library for Q3
+
+## Load libraries and establish settings
+
+**Task** Create a codeblock and load appropriate packages and settings for this lab.
+
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+# Load libraries
+library(tidyverse)
+library(sf)
+library(janitor)
+library(tigris)
+
+```
+
+Let's explore the election results from last night and make some maps! 
+
+## Questions 
+
+**Q1.** Make a county-level map of Maryland's results for governor using `md_gov_county.csv` in the data folder, calculating the difference between Wes Moore's percentage of the total votes and Dan Cox's percentage of the total votes and displaying that percentage difference on the map. What is the story here, and what is the county with the most interesting results?
+
+**A1.**  
+
+```{r}
+md_gov_county <- read_csv("data/md_gov_county.csv") %>% clean_names() %>% 
+  rename("write_ins" = "write-ins")
+
+new_md_gov_county <- md_gov_county %>% 
+  mutate(total_votes = cox + moore + lashar + wallace + harding + write_ins) %>% 
+  mutate(perc_moore = moore/total_votes*100) %>% 
+  mutate(perc_cox = cox/total_votes*100) %>% 
+  mutate(perc_diff = (perc_moore - perc_cox)) %>% 
+  mutate(geoid = as.character(geoid))
+new_md_gov_county
+
+```
+
+
+```{r}
+md_counties <- counties() %>%
+  filter(STATEFP == "24") %>% 
+    rename(geoid = GEOID)
+
+joined_gov_county <- md_counties %>% 
+  left_join(new_md_gov_county, by = "geoid")
+joined_gov_county
+
+```
+
+```{r}
+ggplot() +
+  geom_sf(data=joined_gov_county, aes(fill=perc_diff)) +
+  theme_minimal() +
+  scale_fill_viridis_b(option="magma")
+```
+
+
+**Q2.** Make another map showing the difference between Dan Cox's county-level performance in 2022 and Larry Hogan's in 2018, using percentages to compare the two as you did in Q1. You can use the dataframe you initially loaded for Q1, and you'll need to load the 2018 governor results in the data folder and join them to it before proceeding. Are there any counties where Cox got a higher percentage than Hogan? How would you describe the map showing the Hogan-Cox difference?
+
+Also answer this: is a map the best way to present this data? What else could you make that might convey more information?
+
+**A2.** No, Hogan got more % in all counties.
+
+```{r}
+md_gov_county_18 <- read_csv("data/md_gov_county_18.csv") %>% clean_names()
+
+new_18_gov_county <- md_gov_county_18 %>% 
+  mutate(total_votes = hogan + jealous + quinn + schlakman + write_ins) %>%
+  mutate(perc_hogan = hogan/total_votes*100) %>% 
+  mutate(geoid = as.character(geoid))
+new_18_gov_county
+
+cox_hogan <- joined_gov_county %>% 
+  left_join(new_18_gov_county, by = "geoid") %>% 
+    mutate(perc_diff_hogan_cox = (perc_hogan - perc_cox))
+
+ggplot() +
+  geom_sf(data=cox_hogan, aes(fill=perc_diff_hogan_cox)) +
+  theme_minimal() +
+  scale_fill_viridis_b(option="magma")
+
+```
+
+**Q3** Which county has the highest percentage of mail ballots remaining to be counted? Using the `mail_remaining.csv` file in the data folder, calculate the percentage of mail ballots remaining, then map a county map of those percentages. Looking at both the map and the data, are there counties where the candidate currently leading the governor's race could, in theory, change?
+
+**A3** 
+
+```{r}
+mail_remaining <- read_csv("data/mail_remaining.csv") %>% clean_names()
+
+new_remaining <- mail_remaining %>% 
+  mutate(perc_remain = remaining/total_returned*100) %>% 
+  mutate(geoid = as.character(geoid))
+
+remaining_joined <- joined_gov_county %>% 
+  left_join(new_remaining, by = "geoid")
+
+ggplot() +
+  geom_sf(data=remaining_joined, aes(fill=perc_remain)) +
+  theme_minimal() +
+  scale_fill_viridis_b(option="magma")
+
+```
+
+
+**Q4.** Choose your own map adventure! In the data folder I've included county-level results for several other 2022 contests, including the Comptroller, Attorney General and the marijuana legalization amendment. I've also added the 2020 presidential results by county. Using one of the 2022 races that we haven't already used and at least one other contest for comparison, make a county-level map showing what you think is the most interesting aspect of that data, and describe the results in terms of a possible story. You can bring in other data, such as Census information, if you like.
+
+Difference in counties voting for Biden vs voting for marihuana
+
+
+**A4.**  4 counties where percentage of voters for Biden 2020 is greater than percentage of votes for legalization of marijuana.
+
+```{r}
+md_marijuana_county <- read_csv("data/md_marijuana_county.csv") %>% 
+  clean_names() %>% 
+  rename("xfor" = "for") %>% 
+  mutate(total_marijuana = xfor+against) %>% 
+  mutate(perc_for = xfor/total_marijuana*100)
+
+md_pres_county_20 <- read_csv("data/md_pres_county_20.csv") %>% 
+  clean_names() %>% 
+  mutate(total_votes = trump + biden+ jorgensen + hawkins + segal) %>% 
+  mutate(perc_biden = biden/total_votes*100)
+
+marijuana_pres <- md_marijuana_county %>% 
+  left_join(md_pres_county_20, by = "geoid") %>% 
+  mutate(geoid = as.character(geoid))
+
+joined_mari_pres <- md_counties %>% 
+  left_join(marijuana_pres, by = "geoid") %>% 
+  mutate(diff_biden_marijuana = perc_for - perc_biden)
+
+ggplot() +
+  geom_sf(data=joined_mari_pres, aes(fill=diff_biden_marijuana)) +
+  theme_minimal() +
+  scale_fill_viridis_b(option="magma")
+```
+-30-
