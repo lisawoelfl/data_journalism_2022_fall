@@ -36,7 +36,7 @@ Let's explore the election results from last night and make some maps!
 
 **Q1.** Make a county-level map of Maryland's results for governor using `md_gov_county.csv` in the data folder, calculating the difference between Wes Moore's percentage of the total votes and Dan Cox's percentage of the total votes and displaying that percentage difference on the map. What is the story here, and what is the county with the most interesting results?
 
-**A1.**  
+**A1.** I think it's interesting that there are clear geographic clusters of Moore voters and Cox voters. Garrett and Allegany counties have much more votes for Cox than Moore.
 
 ```{r}
 md_gov_county <- read_csv("data/md_gov_county.csv") %>% clean_names() %>% 
@@ -76,7 +76,7 @@ ggplot() +
 
 Also answer this: is a map the best way to present this data? What else could you make that might convey more information?
 
-**A2.** No, Hogan got more % in all counties.
+**A2.** No, Hogan got more % in all counties. I'd describe it plain an simple: Hogan got more % of votes than Cox in every single county. I don't think the percentage difference convey much meaning. I also don't think a map is the best way to present the data, at least not with my basic mapping skills. The legend would need to show much more granular data, three brackets isn't enough in my opinion. A bar chart would be better in my opinion.
 
 ```{r}
 md_gov_county_18 <- read_csv("data/md_gov_county_18.csv") %>% clean_names()
@@ -100,7 +100,7 @@ ggplot() +
 
 **Q3** Which county has the highest percentage of mail ballots remaining to be counted? Using the `mail_remaining.csv` file in the data folder, calculate the percentage of mail ballots remaining, then map a county map of those percentages. Looking at both the map and the data, are there counties where the candidate currently leading the governor's race could, in theory, change?
 
-**A3** 
+**A3** Quite a few counties still have 100% of mail ballots to count. Yes, the race in Frederick is very close and there are over 14k ballots that haven't been counted yet. Anne Arundel and Talbot are other counties where the results could change.
 
 ```{r}
 mail_remaining <- read_csv("data/mail_remaining.csv") %>% clean_names()
@@ -122,10 +122,10 @@ ggplot() +
 
 **Q4.** Choose your own map adventure! In the data folder I've included county-level results for several other 2022 contests, including the Comptroller, Attorney General and the marijuana legalization amendment. I've also added the 2020 presidential results by county. Using one of the 2022 races that we haven't already used and at least one other contest for comparison, make a county-level map showing what you think is the most interesting aspect of that data, and describe the results in terms of a possible story. You can bring in other data, such as Census information, if you like.
 
-Difference in counties voting for Biden vs voting for marihuana
 
+**A4.** I decided to look at the votes for Biden in 2020 and the votes for marijuana legalization in 2022. I wanted to see if there's a correlation, suspecting that people who voted for the democratic presidential candidate would be more open to drug legalization. 
 
-**A4.**  4 counties where percentage of voters for Biden 2020 is greater than percentage of votes for legalization of marijuana.
+Looking at the map, I can see that marijuana is definitely more popular than Biden. In all but 4 counties and Baltimore city a larger % of people voted for marijuana legalization than Biden. Since the percentage differences are quite large in some counties, I'd say my assumption about the correlation between voting democratic and pro legalization is at the very least pretty weak. I am interested in why Baltimore City is the one location where significantly less people voted for legalization than Biden.
 
 ```{r}
 md_marijuana_county <- read_csv("data/md_marijuana_county.csv") %>% 

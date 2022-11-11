@@ -34,20 +34,31 @@ library(lubridate)
 
 ## Load and Cleaning Data
 
+* Download all dates, leftjoin them together, open refine, download as new csv, split columns into dates
+
 ```{r}
 # Load required data
 # Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
 
-# Clean required data and prepare for analysis if needed. 
+lobbying_registrations <- read_csv("data/lobbying_registrations.csv") %>% clean_names()
 
+# Clean required data and prepare for analysis if needed.
+
+splitting columns -> Google
 
 ```
 
 ## Basic explorations
 
 *How many rows & columns?
+
+We should have 12,855 rows according to the website, but in the dataset, there are only 10,000 rows. We have 5 colums: form id, name of the lobbyist, name of the lobbying firm, name of the employer and the registration period.
+
 *What are limitations & flaws?
 
+Not a lot of information on each dataset, will have to cross-reference and check with entries, especially concerning pay.
+
+Registration period vs dates -> how to work with that?
 
 ### Question 1
 
