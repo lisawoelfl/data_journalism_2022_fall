@@ -37,28 +37,36 @@ library(lubridate)
 * Download all dates, leftjoin them together, open refine, download as new csv, split columns into dates
 
 ```{r}
-# Load required data
-# Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
+# Loading the dataframes and binding them together
 
-lobbying_registrations <- read_csv("data/lobbying_registrations.csv") %>% clean_names()
+one <- read_csv("data/registrations(1).csv") %>% clean_names()
+two <- read_csv("data/registrations(2).csv") %>% clean_names()
+three <- read_csv("data/registrations(3).csv") %>% clean_names()
+four<- read_csv("data/registrations(4).csv") %>% clean_names()
+five <- read_csv("data/registrations(5).csv")%>% clean_names()
 
-# Clean required data and prepare for analysis if needed.
+total_registrations <- rbind(one, two, three, four, five)
 
-splitting columns -> Google
+write_csv(total_registrations, "data/total_registrations.csv")
+
+# We cleaned the data in OpenRefine
+
+clean_total_registrations <- read_csv("data/clean_total_registrations.csv")
 
 ```
 
 ## Basic explorations
 
-*How many rows & columns?
+```{r}
+glimpse(clean_total_registrations)
+```
 
-We should have 12,855 rows according to the website, but in the dataset, there are only 10,000 rows. We have 5 colums: form id, name of the lobbyist, name of the lobbying firm, name of the employer and the registration period.
 
-*What are limitations & flaws?
+The original data had 12855 rows and 5 columns. Our cleaned dataframe has 12855 rows and 7 columns (we added cleaned columns for organization name & employer). In the dataset for all registrations, we have variables for the registrant's name, their organization, their employer, the form id and the registration period.
 
-Not a lot of information on each dataset, will have to cross-reference and check with entries, especially concerning pay.
+Limitations: The dataframe is pretty basic with a small number of columns. That means we will have to cross-reference the website, if we want to know how much a lobbyist is making or how much an employer is spending on lobbying. The general dataset doesn't even include the registration matters. For our topical questions, we have to download new datasets for every registration matter we're interested in. Another limitation is that the data doesn't go back very far. The earliest data is from 2019, which means we can't look at long-term trends.
 
-Registration period vs dates -> how to work with that?
+Other than that, the data looked pretty clean in OpenRefine. We found just a handful of names to clean up.
 
 ### Question 1
 
