@@ -18,11 +18,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction 
 
-In this notebook, we are analysing data from the Maryland Lobbying Registrations. [https://lobby-ethics.maryland.gov/]
+In this notebook, we are analyzing data from the Maryland Lobbying Registrations. [https://lobby-ethics.maryland.gov/]
 
 ## Load libraries
-
-Loading required libraries for this analysis.
 
 ```{r echo=FALSE, message=FALSE}
 # Load the tidyverse here
@@ -62,11 +60,15 @@ clean_total_registrations[c('start', 'end')] <- str_split_fixed(clean_total_regi
 glimpse(clean_total_registrations)
 ```
 
-The original dataframe had 12855 rows and 5 columns. Our cleaned dataframe has 12855 rows and 9 columns (we added cleaned columns for organization name & employer and split the date column to have a start and end date for the registration). 
+The original dataframe had 12855 rows and 5 columns. Our cleaned dataframe has 12855 rows and 9 columns (we added cleaned columns for organization name & employer and split the date column to have a start and end date for the registration).
+
+The data looked pretty clean in OpenRefine. We found just a handful of names to clean up.
 
 Limitations: The dataframe is pretty basic with a small number of columns. That means we will have to cross-reference the website, if we want to know how much a lobbyist is making or how much an employer is spending on lobbying. The standard dataset doesn't even include the registration matters. For our topical questions, we have to download new datasets for every registration matter we're interested in. Another limitation is that the earliest data is from 2019, which means we can't look at long-term trends.
 
-Other than that, the data looked pretty clean in OpenRefine. We found just a handful of names to clean up.
+To answer most of our questions, we will have to do additional research. For example, we can ask the number of employers and lobbyists in the energy sector and see how that changed over the last few years. To examine how much the top firms make, we have to go back to the website.
+
+When looking into the PG county youth curfew, we won't get clear cut answers from the data alone. Trying to find a connection between the number of lobbyists for matters of juvenile law and the implementation of the curfew will require additional research on our part.
 
 ### Question 1
 
