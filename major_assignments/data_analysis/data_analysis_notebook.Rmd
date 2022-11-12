@@ -30,6 +30,9 @@ library(tidyverse)
 # Load janitor here
 library(janitor)
 library(lubridate)
+library(stringr)
+library(dplyr)
+library(tidyr)
 ```
 
 ## Load and Cleaning Data
@@ -49,10 +52,10 @@ total_registrations <- rbind(one, two, three, four, five)
 
 write_csv(total_registrations, "data/total_registrations.csv")
 
-# We cleaned the data in OpenRefine
+# We cleaned the data in OpenRefine and split the date column
 
 clean_total_registrations <- read_csv("data/clean_total_registrations.csv")
-
+clean_total_registrations[c('start', 'end')] <- str_split_fixed(clean_total_registrations$registration_period, '-', 2)
 ```
 
 ## Basic explorations
@@ -62,9 +65,9 @@ glimpse(clean_total_registrations)
 ```
 
 
-The original data had 12855 rows and 5 columns. Our cleaned dataframe has 12855 rows and 7 columns (we added cleaned columns for organization name & employer). In the dataset for all registrations, we have variables for the registrant's name, their organization, their employer, the form id and the registration period.
+The original data had 12855 rows and 5 columns. Our cleaned dataframe has 12855 rows and 9 columns (we added cleaned columns for organization name & employer and split the date column to have a start and end date for the registration). 
 
-Limitations: The dataframe is pretty basic with a small number of columns. That means we will have to cross-reference the website, if we want to know how much a lobbyist is making or how much an employer is spending on lobbying. The general dataset doesn't even include the registration matters. For our topical questions, we have to download new datasets for every registration matter we're interested in. Another limitation is that the data doesn't go back very far. The earliest data is from 2019, which means we can't look at long-term trends.
+Limitations: The dataframe is pretty basic with a small number of columns. That means we will have to cross-reference the website, if we want to know how much a lobbyist is making or how much an employer is spending on lobbying. The standard dataset doesn't even include the registration matters. For our topical questions, we have to download new datasets for every registration matter we're interested in. Another limitation is that the earliest data is from 2019, which means we can't look at long-term trends.
 
 Other than that, the data looked pretty clean in OpenRefine. We found just a handful of names to clean up.
 
