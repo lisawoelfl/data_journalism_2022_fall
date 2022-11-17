@@ -43,8 +43,12 @@ two <- read_csv("data/registrations(2).csv") %>% clean_names()
 three <- read_csv("data/registrations(3).csv") %>% clean_names()
 four<- read_csv("data/registrations(4).csv") %>% clean_names()
 five <- read_csv("data/registrations(5).csv")%>% clean_names()
+six <- read_csv("data/registrations(6).csv")%>% clean_names()
+seven <- read_csv("data/registrations(7).csv")%>% clean_names()
+eight <- read_csv("data/registrations(8).csv")%>% clean_names()
+nine <- read_csv("data/registrations(9).csv")%>% clean_names()
 
-total_registrations <- rbind(one, two, three, four, five)
+total_registrations <- rbind(one, two, three, four, five, six, seven, eight, nine)
 
 write_csv(total_registrations, "data/total_registrations.csv")
 
@@ -72,5 +76,30 @@ When looking into the PG county youth curfew, we won't get clear cut answers fro
 
 ### Question 1
 
+
+
 * **Question text**: 
 * **Analysis summary**:
+
+
+
+### Question 4
+
+* **Question text**: How did the number of employers and lobbyists in the energy sector change from 2018 to 2022?
+
+Starting with the basic analysis of lobbyist registrations from the energy sector, we want to explore how lobbying efforts have changed in the past years. Follow-up questions include: Which firms have the most employers? How much money did the top 3 firms make from employers in the energy sector? Are big employers part of fossil fuels, clean energy or others?
+
+**Analysis summary**:
+
+```{r}
+energy_registrations <- read_csv("data/clean_energy-registrations.csv") %>% clean_names()
+energy_registrations[c('start', 'end')] <- str_split_fixed(energy_registrations$registration_period, '-', 2)
+
+energy_registrations %>% 
+  as.date("") %>% 
+  as.date("end")
+
+glimpse(energy_registrations)
+
+```
+
