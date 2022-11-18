@@ -87,7 +87,7 @@ When looking into the PG county youth curfew, we won't get clear cut answers fro
 
 * **Question text**: How did the number of employers and lobbyists in the energy sector change from 2018 to 2022?
 
-Starting with the basic analysis of lobbyist registrations from the energy sector, we want to explore how lobbying efforts have changed in the past years. Follow-up questions include: Which firms have the most employers? How much money did the top 3 firms make from employers in the energy sector? Are big employers part of fossil fuels, clean energy or others?
+Starting with the basic analysis of lobbyist registrations from the energy sector, we want to explore how lobbying efforts have changed in the past years. Follow-up questions include: Which firms had the most employers in our time frame? How much money did the top 3 firms make from employers in the energy sector (in 2022)? Who are their employers? Are they part of fossil fuels, clean energy or others?
 
 **Analysis summary**:
 
@@ -95,11 +95,27 @@ Starting with the basic analysis of lobbyist registrations from the energy secto
 energy_registrations <- read_csv("data/clean_energy-registrations.csv") %>% clean_names()
 energy_registrations[c('start', 'end')] <- str_split_fixed(energy_registrations$registration_period, '-', 2)
 
-energy_registrations %>% 
-  as.date("") %>% 
-  as.date("end")
+energy_registrations <- energy_registrations %>% 
+  mutate(new_start = as.Date(start, format = "%m/%d/%y")) %>% 
+  mutate(new_end = as.Date(end, format = "%m/%d/%y")) %>% 
+  mutate(start_year = floor_date(new_start, "year"))
 
-glimpse(energy_registrations)
+year_energy_registrations <- energy_registrations %>% 
+  group_by(start_year) %>%
+  summarise(count = n_distinct(clean_lobbyist_registrant))
+year_energy_registrations
 
+employer_energy <- energy_registrations %>% 
+  group_by(clean_organization_firm) %>% 
+  summarise(count = n_distinct(clean_employer)) %>% 
+  arrange(desc(count))
+employer_energy
+  
 ```
 
+Firms with most employers: 
+- Compass Government Relations Partners, LLC
+- Perry White Ross & Jacobson
+- Rifkin Weiner Livingston LLC
+
+Research on website
