@@ -221,7 +221,7 @@ Once again we get a list of two as our result. In this case, we don't want to is
 
 ### Task 10: Isolate the list of `li` tags inside the HTML using `html_elements`
 **Task** Run the following code in the gray-colored codeblock below to find the <li> tags. What does the output suggest about how many <ul> tags there are in the HTML source?
-**Answer** 
+**Answer** 37
 
 ```{r}
 cmte_results %>% html_elements('li')
