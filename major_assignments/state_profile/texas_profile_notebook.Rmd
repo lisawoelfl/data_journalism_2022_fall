@@ -1,0 +1,124 @@
+---
+title: "Texas State Profile"
+author: "Lisa Wölfl"
+date: "26/11/22"
+output:
+  html_document:
+    theme: cerulean
+    highlight: pygments
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction 
+
+In this notebook, I'll examine donations and spending data for the two Texas party committees. I want to understand how state parties got their money and how they spent it. I'll look for possible stories around my findings.
+
+## Load libraries
+
+Loading required libraries for this analysis.
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(stringr)
+library(dplyr)
+library(tidyr)
+```
+
+## Load and Cleaning Data
+.
+
+```{r}
+# Load required data
+
+rep_receipts <- read_csv("data/rep_receipts.csv") %>% clean_names()
+rep_disbursements <- read_csv("data/rep_disbursements.csv") %>% clean_names()
+
+write_csv(rep_disbursements, "data/rep_disbursements.csv")
+
+dem_receipts <- read_csv("data/dem_receipts.csv") %>% clean_names()
+dem_disbursements <- read_csv("data/dem_disbursements.csv") %>% clean_names() 
+
+write_csv(dem_disbursements, "data/dem_disbursements.csv")
+```
+
+
+### Who are the parties' donors?
+
+How can you describe (broadly) the party’s donors? Where do the parties get their money and from what kinds of donors? Do they raise a lot in small amounts or from out of state donors?
+
+```{r}
+
+## Analysis of receipt data: Texas Democratic Party
+
+total_dem_receipts <- dem_receipts %>% 
+  group_by(contributor_name) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+state_dem_receipts <- dem_receipts %>% 
+  group_by(contributor_state) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+  
+industry_dem_receipts <- dem_receipts %>% 
+  group_by(contributor_occupation) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+count_dem_receipts <- dem_receipts %>% 
+  group_by(contributor_name) %>% 
+  summarise(count_donations = n()) %>% 
+  arrange(desc(count_donations))
+
+type_dem_receipts <- dem_receipts %>% 
+  group_by(entity_type_desc) %>% 
+  summarise(total = sum(contribution_receipt_amount))
+```
+
+```{r}
+
+## Analysis of receipt data: Texas Republican Party
+
+total_rep_receipts <- rep_receipts %>% 
+  group_by(contributor_name) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+state_rep_receipts <- rep_receipts %>% 
+  group_by(contributor_state) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+  
+industry_rep_receipts <- rep_receipts %>% 
+  group_by(contributor_occupation) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+count_rep_receipts <- rep_receipts %>% 
+  group_by(contributor_name) %>% 
+  summarise(count_donations = n()) %>% 
+  arrange(desc(count_donations))
+
+type_rep_receipts <- rep_receipts %>% 
+  group_by(entity_type_desc) %>% 
+  summarise(total = sum(contribution_receipt_amount))
+```
+
+## What do the parties spend their money on?
+
+You may need OpenRefine to help you standardize the purpose of spending. Can you tell much about the strategy behind the spending from the data?
+
+
+
+## What are the differences and similarities when comparing the parties?
+
+## What about either donors or spending prompts further questions?
