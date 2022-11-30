@@ -100,7 +100,7 @@ The 3 firms with the most employers registered for energy lobbying since 2019 ar
 - Perry White Ross & Jacobson (8 employers)
 - Rifkin Weiner Livingston LLC (8 employers)
 
-Next steps for this portions inlcude getting new data from the "Maryland Lobbying Registrations"-Website to look through "energy" employers and their spending.
+Next steps for this portions include getting new data from the "Maryland Lobbying Registrations"-Website to look through "energy" employers and their spending. Also, looking at the newer registrants and see who they represent.
 
 ```{r}
 ## The dataset has been cleaned in OpenRefine. We clean the names and split the date column, so we have a start and an end date for the registration.
