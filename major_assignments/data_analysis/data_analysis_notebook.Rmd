@@ -87,7 +87,7 @@ When looking into the PG county youth curfew, we won't get clear cut answers fro
 
 * **Question text**: How did the number of employers and lobbyists registered for "energy" change from 2018 to 2022?
 
-Starting with the basic analysis of lobbyist registrations categorized under the registration matter "energy", we want to explore lobbying efforts in the energy sector. Follow-up questions include: Which firms had the most employers in our time frame? How much money did the top 3 firms make from employers in the energy sector (in 2022)? Who are their employers? Are they part of fossil fuels, clean energy or others?
+Starting with the basic analysis of lobbyist registrations categorized under the registration matter "energy", we want to explore lobbying efforts in the energy sector.
 
 Limitations: Although the general dataset on registrations goes back to 2015, datasets including the registration matter only go back to 2019.
 
@@ -100,7 +100,10 @@ The 3 firms with the most employers registered for energy lobbying since 2019 ar
 - Perry White Ross & Jacobson (8 employers)
 - Rifkin Weiner Livingston LLC (8 employers)
 
-Next steps for this portions include getting new data from the "Maryland Lobbying Registrations"-Website to look through "energy" employers and their spending. Also, looking at the newer registrants and see who they represent.
+We've found that Exxon Mobil Corporation appears as an employer for the first time in 2022. This is already interesting, as Exxon is a huge player in the energy sector. Also, according to his report, the lobbyist received $0: https://lobby-ethics.maryland.gov/lobbyist_registrations/6308010abf04d6058af6ddc8/activity_reports/630cbaa7bf04d6058b1e0418
+
+Further research on the MSEC website shows that Exxon has appeared in different categories on the past, "Environment" and "Others".
+
 
 ```{r}
 ## The dataset has been cleaned in OpenRefine. We clean the names and split the date column, so we have a start and an end date for the registration.
@@ -143,7 +146,7 @@ year_energy_employers
 
 employer_energy <- energy_registrations %>% 
   group_by(clean_organization_firm) %>% 
-  summarise(count = n_distinct(clean_employer)) %>% 
+  summarise(count = n_distinct(clean_employer)) %>%
   arrange(desc(count))
 employer_energy
 ```
@@ -157,6 +160,110 @@ top_three <- energy_registrations %>%
   arrange(clean_organization_firm)
 top_three
 ```
+
+
+```{r}
+## Now we want find out who has registered for the first time in 2022.
+
+new_registrants <- energy_registrations %>% 
+  group_by(clean_lobbyist_registrant) %>% 
+  summarise(first = min(start_year)) %>% 
+  filter(first == "2022-01-01")
+new_registrants
+
+## And who these new registrants work for
+
+new_registrants_employers <- energy_registrations %>% 
+  group_by(clean_lobbyist_registrant, clean_employer) %>% 
+  summarise(first = min(start_year)) %>% 
+  filter(first == "2022-01-01")
+new_registrants_employers
+
+## Then we want to know which employers registered for "energy" for the first time in 2022
+
+new_employers <- energy_registrations %>% 
+  group_by(clean_employer) %>% 
+  summarise(first = min(start_year)) %>% 
+  filter(first == "2022-01-01")
+new_employers
+
+```
+### Question X
+
+* **Question text**: Who were the top earners of the latest complete lobbying year (Nov 21 - Oct 22) and who were the employers that spent the most money?
+
+In the MSEC activity reports, lobbyists have to report the compensation they have received. The employers state their total expenses.
+
+Limitations: While the data for lobbyist registrations can be filtered by registration matter, the same isn't possibly for the activity reports.
+
+**Analysis summary**
+
+Matthew Celentano is by far the top earner for the latest complete lobbying year (Nov 21 - Oct 22). He was compensated over 100 million dollars by the League of Life & Health Insurers of Maryland, Inc. Celentano works for the firm Funk & Bolton, P.A.. According to his LinkedIn profile, he is also the executive director of League of Life, which is a trade association for the insurance industry. (Unsurprisingly, League of Life is the employer that spent the most money in this lobbying year. It's the only employer spending over a million. Second place goes to Constellation Energy Generation, LLC, which spent over $800,000.)
+
+That seems a little suspicious. We are wondering, if that is a legal and common business practice or ff there might be something going on worth investigating.
+
+12 lobbyists made over a million, while 174 made less than one thousand dollars, 131 of those were compensated $0.
+
+Maryland Veterinary Medical Association	spend the least money of all employers with just over $18,000.
+
+```{r}
+
+## The activity reports can't be filtered by energy registrations, but we want to know which lobbyist made the most money in the reporting period November 21 - October 22 and which employer spent the most money on lobbying.
+
+## We fix the date
+
+activity_reports <- read_csv("data/activity_reports_nov_21_oct_22.csv") %>% clean_names()
+activity_reports[c('start', 'end')] <- str_split_fixed(activity_reports$reporting_period, '-', 2)
+
+activity_reports <- activity_reports %>% 
+  mutate(new_start = as.Date(start, format = "%m/%d/%y")) %>% 
+  mutate(new_end = as.Date(end, format = "%m/%d/%y")) %>% 
+  mutate(start_year = floor_date(new_start, "year"))
+activity_reports
+
+## And transform the relevant columns to numeric
+
+clean_activity_reports <- activity_reports %>% 
+  mutate(total_expenses = gsub(",","",total_expenses)) %>% 
+  mutate(total_expenses = str_remove(total_expenses, "[$]")) %>% 
+  mutate(total_expenses = as.numeric(total_expenses)) %>% 
+  mutate(lobbyist_compensation = gsub(",","",lobbyist_compensation)) %>% 
+  mutate(lobbyist_compensation = str_remove(lobbyist_compensation, "[$]")) %>% 
+  mutate(lobbyist_compensation = as.numeric(lobbyist_compensation))
+clean_activity_reports
+
+## Now we want to see the top earners among the lobbyists
+
+top_lobbyists <- clean_activity_reports %>% 
+  group_by(lobbyist_registrant) %>% 
+  summarise(lobbyist_compensation = sum(lobbyist_compensation)) %>% 
+  arrange(desc(lobbyist_compensation))
+top_lobbyists
+
+over_million <- top_lobbyists %>% 
+  filter(lobbyist_compensation > 1000000)
+over_million
+
+less_thousand <- top_lobbyists %>% 
+  filter(lobbyist_compensation < 1000)
+less_thousand
+
+zero <- top_lobbyists %>% 
+  filter(lobbyist_compensation == 0)
+zero
+
+celentano <- clean_activity_reports %>% 
+  filter(lobbyist_registrant == "Celentano, Matthew")
+celentano
+
+## Now we want to know which employers spend the most money
+
+top_employers <- clean_activity_reports %>% 
+  group_by(employer) %>% 
+  summarise(total_expenses = sum(total_expenses)) %>% 
+  arrange(desc(total_expenses))
+top_employers
+
 ```
   
   
