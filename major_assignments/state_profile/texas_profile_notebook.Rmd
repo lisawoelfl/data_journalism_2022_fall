@@ -39,15 +39,18 @@ library(tidyr)
 ```{r}
 # Load required data
 
-rep_receipts <- read_csv("data/rep_receipts.csv") %>% clean_names()
+rep_contribs <- read_csv("data/rep_contribs.csv") %>% clean_names()
 rep_disbursements <- read_csv("data/rep_disbursements.csv") %>% clean_names()
 
 write_csv(rep_disbursements, "data/rep_disbursements.csv")
 
-dem_receipts <- read_csv("data/dem_receipts.csv") %>% clean_names()
+dem_contribs <- read_csv("data/dem_contribs.csv") %>% clean_names()
 dem_disbursements <- read_csv("data/dem_disbursements.csv") %>% clean_names() 
 
 write_csv(dem_disbursements, "data/dem_disbursements.csv")
+
+clean_rep_disburs <- read_csv("data/clean_rep_disbursements.csv")
+clean_dem_disburs <- read_csv("data/clean_dem_disbursements.csv")
 ```
 
 
@@ -59,28 +62,28 @@ How can you describe (broadly) the party’s donors? Where do the parties get th
 
 ## Analysis of receipt data: Texas Democratic Party
 
-total_dem_receipts <- dem_receipts %>% 
+total_dem_contribs <- dem_contribs %>% 
   group_by(contributor_name) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
 
-state_dem_receipts <- dem_receipts %>% 
+state_dem_contribs <- dem_contribs %>% 
   group_by(contributor_state) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
   
-industry_dem_receipts <- dem_receipts %>% 
+industry_dem_contribs <- dem_contribs %>% 
   group_by(contributor_occupation) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
 
-count_dem_receipts <- dem_receipts %>% 
+count_dem_contribs <- dem_contribs %>% 
   group_by(contributor_name) %>% 
   summarise(count_donations = n()) %>% 
   arrange(desc(count_donations))
 
-type_dem_receipts <- dem_receipts %>% 
-  group_by(entity_type_desc) %>% 
+type_dem_contribs <- dem_contribs %>% 
+  group_by(receipt_type_desc) %>% 
   summarise(total = sum(contribution_receipt_amount))
 ```
 
@@ -88,34 +91,36 @@ type_dem_receipts <- dem_receipts %>%
 
 ## Analysis of receipt data: Texas Republican Party
 
-total_rep_receipts <- rep_receipts %>% 
+total_rep_contribs <- rep_contribs %>% 
   group_by(contributor_name) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
 
-state_rep_receipts <- rep_receipts %>% 
+state_rep_contribs <- rep_contribs %>% 
   group_by(contributor_state) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
   
-industry_rep_receipts <- rep_receipts %>% 
+industry_rep_contribs <- rep_contribs %>% 
   group_by(contributor_occupation) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
 
-count_rep_receipts <- rep_receipts %>% 
+count_rep_contribs <- rep_contribs %>% 
   group_by(contributor_name) %>% 
   summarise(count_donations = n()) %>% 
   arrange(desc(count_donations))
 
-type_rep_receipts <- rep_receipts %>% 
-  group_by(entity_type_desc) %>% 
+type_rep_contribs <- rep_contribs %>% 
+  group_by(receipt_type_desc) %>% 
   summarise(total = sum(contribution_receipt_amount))
 ```
 
 ## What do the parties spend their money on?
 
-You may need OpenRefine to help you standardize the purpose of spending. Can you tell much about the strategy behind the spending from the data?
+```{r}
+clean_dem_disburs
+```
 
 
 
