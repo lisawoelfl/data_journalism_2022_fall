@@ -91,7 +91,7 @@ Starting with the basic analysis of lobbyist registrations categorized under the
 
 Limitations: Although the general dataset on registrations goes back to 2015, datasets including the registration matter only go back to 2019.
 
-**Analysis summary**: As our data shows, 106 lobbyists have registered for "energy" in 106, 132 in 2020, 123 in 2021 and 2022 in 115. One could have assumed that since the climate crisis has been big news in recent years that there would have been more lobbyists, which doesn't seem to be the case. The numbers has been reclining since 2020. Since 2020 was the first pandemic year, there could be a connection. Did employers have less money to spend on lobbying?
+**Analysis summary**: As our data shows, 106 lobbyists have registered for "energy" in 106, 132 in 2020, 123 in 2021 and 2022 in 115. One could have assumed that since the climate crisis has been big news in recent years that there would have been more lobbyists, which doesn't seem to be the case. The numbers have been declining since 2020. Since 2020 was the first pandemic year, there could be a connection. Employers might have had less money to spend on lobbying.
 
 Interestingly, while the number of lobbyists declined, the number of employers grew before 2022. In 2019 there were 66 employers, in 2020 88, in 2021 85 and in 2022 there were 78 employers in the registration matter category "energy".
 
@@ -100,10 +100,13 @@ The 3 firms with the most employers registered for energy lobbying since 2019 ar
 - Perry White Ross & Jacobson (8 employers)
 - Rifkin Weiner Livingston LLC (8 employers)
 
-We've found that Exxon Mobil Corporation appears as an employer for the first time in 2022. This is already interesting, as Exxon is a huge player in the energy sector. Also, according to his report, the lobbyist received $0: https://lobby-ethics.maryland.gov/lobbyist_registrations/6308010abf04d6058af6ddc8/activity_reports/630cbaa7bf04d6058b1e0418
+We found that Exxon Mobil Corporation appears as an employer for the first time in 2022. This is already interesting, as Exxon is a huge player in the energy sector nationwide. Further research on the MSEC website shows that Exxon has appeared in different categories on the past, "Environment" and "Others". 
 
-Further research on the MSEC website shows that Exxon has appeared in different categories on the past, "Environment" and "Others".
+But, according to his report, the lobbyist received $0. In fact, all available activity reports for Exxon indicate that the company has never spent a single dollar on lobbying in Maryland. 
 
+According to Exxon's own 2020 lobbying report, the corporation spent the most in Alaska ($183,000) for "oil and gas issues, policies, and tax legislation". In Texas, Exxon lobbied around alcoholic beverage regulation, education, insurance, labor and malpractice-health care providers. These topics are not directly related to Exxon's business. It could be interesting to look into what Exxon is trying to achieve in Texas and how its lobbying efforts on these issues relate to its business model.
+
+Lobbying report: https://corporate.exxonmobil.com/-/media/Global/Files/policy/lobbying/ExxonMobil_2020-Lobbying-Report.pdf
 
 ```{r}
 ## The dataset has been cleaned in OpenRefine. We clean the names and split the date column, so we have a start and an end date for the registration.
@@ -190,21 +193,19 @@ new_employers
 ```
 ### Question X
 
-* **Question text**: Who were the top earners of the latest complete lobbying year (Nov 21 - Oct 22) and who were the employers that spent the most money?
+* **Question text**: Who earned the most money in the latest complete lobbying year (Nov 21 - Oct 22) and which emploeyer spent the most?
 
-In the MSEC activity reports, lobbyists have to report the compensation they have received. The employers state their total expenses.
-
-Limitations: While the data for lobbyist registrations can be filtered by registration matter, the same isn't possibly for the activity reports.
+In the MSEC activity reports, lobbyists have to report the compensation they have received. The employers state their total expenses. Limitations: While the data for lobbyist registrations can be filtered by registration matter, the same isn't possibly for the activity reports.
 
 **Analysis summary**
 
 Matthew Celentano is by far the top earner for the latest complete lobbying year (Nov 21 - Oct 22). He was compensated over 100 million dollars by the League of Life & Health Insurers of Maryland, Inc. Celentano works for the firm Funk & Bolton, P.A.. According to his LinkedIn profile, he is also the executive director of League of Life, which is a trade association for the insurance industry. (Unsurprisingly, League of Life is the employer that spent the most money in this lobbying year. It's the only employer spending over a million. Second place goes to Constellation Energy Generation, LLC, which spent over $800,000.)
 
-That seems a little suspicious. We are wondering, if that is a legal and common business practice or ff there might be something going on worth investigating.
+In the years before, Celentano made much less money, between $190,000 and $300,000. We couldn't find any explanations for the sharp rise in the spending of League of Life, which has been paying Celentano for lobbying at least since 2019. There aren't any relevant news stories about League of Life or Celentano. The extremely high amount spent could indicate a simple typo or a bigger story. Either way, this finding is worth investigating.
 
-12 lobbyists made over a million, while 174 made less than one thousand dollars, 131 of those were compensated $0.
+Overall, 12 lobbyists made over a million, while 174 made less than one thousand dollars, 131 of those were compensated $0.
 
-Maryland Veterinary Medical Association	spend the least money of all employers with just over $18,000.
+Maryland Veterinary Medical Association	spent the least money of all employers with just over $18,000.
 
 ```{r}
 
@@ -240,17 +241,25 @@ top_lobbyists <- clean_activity_reports %>%
   arrange(desc(lobbyist_compensation))
 top_lobbyists
 
+## Who made over a million?
+
 over_million <- top_lobbyists %>% 
   filter(lobbyist_compensation > 1000000)
 over_million
+
+## Who made less than $1,000?
 
 less_thousand <- top_lobbyists %>% 
   filter(lobbyist_compensation < 1000)
 less_thousand
 
+## Who was registered but did not make any money?
+
 zero <- top_lobbyists %>% 
   filter(lobbyist_compensation == 0)
 zero
+
+## Who does the top earner Matthew Celentano work for?
 
 celentano <- clean_activity_reports %>% 
   filter(lobbyist_registrant == "Celentano, Matthew")
@@ -264,6 +273,43 @@ top_employers <- clean_activity_reports %>%
   arrange(desc(total_expenses))
 top_employers
 
+```
+```{r}
+## Let's take a closer look at Celentano's activity reports
+
+celentano_reports <- read_csv("data/celentano_activity_reports.csv") %>% clean_names()
+celentano_reports[c('start', 'end')] <- str_split_fixed(celentano_reports$reporting_period, '-', 2)
+
+## We fix the dates
+
+celentano_reports <- celentano_reports %>% 
+  mutate(new_start = as.Date(start, format = "%m/%d/%y")) %>% 
+  mutate(new_end = as.Date(end, format = "%m/%d/%y")) %>% 
+  mutate(start_year = floor_date(new_start, "year"))
+celentano_reports
+
+## And convert the relevant columns to numeric
+
+clean_celentano_reports <- celentano_reports %>% 
+  mutate(total_expenses = gsub(",","",total_expenses)) %>% 
+  mutate(total_expenses = str_remove(total_expenses, "[$]")) %>% 
+  mutate(total_expenses = as.numeric(total_expenses)) %>% 
+  mutate(lobbyist_compensation = gsub(",","",lobbyist_compensation)) %>% 
+  mutate(lobbyist_compensation = str_remove(lobbyist_compensation, "[$]")) %>% 
+  mutate(lobbyist_compensation = as.numeric(lobbyist_compensation))
+clean_celentano_reports
+
+## We want to see how much Celentano reported each year
+
+clean_celentano_reports %>% 
+  group_by(start_year) %>% 
+  summarise(sum(lobbyist_compensation))
+
+## When did he start working for League of Life?
+
+clean_celentano_reports %>% 
+  filter(employer == "League of Life & Health Insurers of Maryland, Inc.")
+  
 ```
   
   
