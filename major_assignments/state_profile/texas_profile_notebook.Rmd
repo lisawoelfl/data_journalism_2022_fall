@@ -39,12 +39,12 @@ library(tidyr)
 ```{r}
 # Load required data
 
-rep_contribs <- read_csv("data/rep_contribs.csv") %>% clean_names()
+rep_receipts <- read_csv("data/rep_receipts.csv") %>% clean_names()
 rep_disbursements <- read_csv("data/rep_disbursements.csv") %>% clean_names()
 
 write_csv(rep_disbursements, "data/rep_disbursements.csv")
 
-dem_contribs <- read_csv("data/dem_contribs.csv") %>% clean_names()
+dem_receipts <- read_csv("data/dem_receipts.csv") %>% clean_names()
 dem_disbursements <- read_csv("data/dem_disbursements.csv") %>% clean_names() 
 
 write_csv(dem_disbursements, "data/dem_disbursements.csv")
@@ -54,64 +54,200 @@ clean_dem_disburs <- read_csv("data/clean_dem_disbursements.csv")
 ```
 
 
-### Who are the parties' donors?
+### Anaylsis for Democratic Party Committee
 
-How can you describe (broadly) the party’s donors? Where do the parties get their money and from what kinds of donors? Do they raise a lot in small amounts or from out of state donors?
+The Dems total receipts amount to $5,529,205. Most of the money comes from individuals: $2,175,117.6. $447,712.3 came from organizations, the rest from committees.
+
+The biggest contributors are democratic committees and funds. #4 is Elizabeth Pannill Fletcher for Congress, after that „VLM cooperative inc“, which hardly shows up on Google, expect for a tweet by journalist Derek WIllis, who wondered about VLM cooperative back in 2014.
+
+The committee received most money from Texas (2.6 millions), D.C. (181k) and California (36k).
+
+Most contributions from individuals come from Texas (1.3 millions), followed by California (323k) and New York (67k).
+
+Bruce Jamison, from Spring Texas, is the person who contributed most often to the party committee: 117 times. According to the data, he is unemployed. Each donation is between 7 and 100 Dollars.
+
+Kevin Rowe has contributed the most, spending 29,900 Dollars. He is from California and a „managing member“ at K Rowe Investments. He has contributed 7 times. Spending between 2,500 and 9,900 Dollars each.
+
+On average, indidivuals contributed a total of 177.17 Dollars and a median of 38 Dollars. That is probably because a few people are donating a lot, but most don’t.
+
+The Dems have spent a total of $5,328,675. The largest chunk (1.7 millions) went to ADP, which is a company that does payrolling, HR and tax. #2 is NGP, which does Webhosting. Hannah Beck is the invidiual that received the most money from the committee (133k). She is the Convention Director with the Texas Democratic Party. Followed by Jamarr Brown, Executive Director at the Texas Democratic Party.
+
+Most of the disbursement went to Texas (3.7 million), D.C. (678k) and California (279k). The committee spent the most on payroll and related expenses. Interesting disbursements include a ton of money for credit card processing fees (140k), 95k für digital ads (all of which went towards Rising Tide Interactive LLC, a digital marketing agency).
+
+## Analysis for Republican Party Committee
+
+The GOP received a total of $7,624,398. The committee raised $2,941,551 from individuals, $690,332 from organizations and the rest from other committees.
+
+One of the biggest donors is the Houston First Coporations, which a local goverment corporation operating arts and convention spaces. It’s notable that a government corporating, instated by the city council, would donate $500,000 to a party committee.
+
+Harlan Crow is the individual that has donated the most, spending $175,000. He’s a real estate developer from Texas and chairman of the board of directors at Crow Holdings. He is followed by Charls Saulsbury Senior and Junior, who combined have spent $129,500.
+
+David Ahlquist from San Antonio, Texas has contributed most often, 251 times, spending between $8.34 and $354 each time.
+
+The mean donation by an individual was $216.34, while the median was $50.
+
+Most of the money came from Texas (4.1 million), D.C. (2.1 million) and Virgina (582k). Contributions from individuals came from Texas (2.4 million), California (169k) and Florida (98k).
+
+The Republican committee has spent $6,850,935. Most of it went towards te HR and payroll provider Paylocity (629k). #2 was Rival Strategy Group LLC, a consulting firm (620k). Interestingly, the committee spent around 153k on Hilton Americas in Houston, which donated 81k to the committee. It seems that the committee has held parties at the Hilton.
+
+The Democrats didn’t fill out the category code in the dataset, but Republicans did for all but $2 million of the disbursement, showing that the committee spent most on solicitation & fundraising (1.7 million), administrative expenses (1.5 million) and transfers (831k). Travel expenses were high (190k).
+
+Lisa Hendrickson was the individual that received the most money, she’s the Chief of Staff at the Republican Party of Texas.
 
 ```{r}
 
 ## Analysis of receipt data: Texas Democratic Party
 
-total_dem_contribs <- dem_contribs %>% 
+## Total receipts: $5,529,205
+
+total_dem_receipts <- dem_receipts %>% 
+    summarise(total = sum(contribution_receipt_amount))
+
+## Grouping by contributor type
+
+con_type_dem_receipts <- dem_receipts %>% 
+  group_by(entity_type_desc) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+## Grouping by contributor
+
+contributor_dem_receipts <- dem_receipts %>% 
   group_by(contributor_name) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
 
-state_dem_contribs <- dem_contribs %>% 
+# What states are the contributions from?
+
+state_dem_receipts <- dem_receipts %>% 
   group_by(contributor_state) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
+
+# What states are the individual contributions from?
+
+ind_state_dem_receipts <- dem_receipts %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+  group_by(contributor_state) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+## What are the individual contributors occupations?
   
-industry_dem_contribs <- dem_contribs %>% 
+industry_dem_receipts <- dem_receipts %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
   group_by(contributor_occupation) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
 
-count_dem_contribs <- dem_contribs %>% 
+## Which individuals have contributed most often?
+
+count_dem_receipts <- dem_receipts %>% 
   group_by(contributor_name) %>% 
   summarise(count_donations = n()) %>% 
   arrange(desc(count_donations))
 
-type_dem_contribs <- dem_contribs %>% 
+bruce <- dem_receipts %>% 
+  filter(contributor_name == "JAMISON, BRUCE")
+
+## Which individual has contributed the most?
+
+most_ind_dem_receipts <- dem_receipts %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+  group_by(contributor_name) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+kevin <- dem_receipts %>% 
+  filter(contributor_name == "ROWE, KEVIN")
+
+## What do the individual donations look like?
+
+dem_mean_receipts <- dem_receipts %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+    summarise(mean = mean(contribution_receipt_amount),median = median(contribution_receipt_amount))
+            
+## What types of receipts are most relevant?
+
+type_dem_receipts <- dem_receipts %>% 
   group_by(receipt_type_desc) %>% 
-  summarise(total = sum(contribution_receipt_amount))
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
 ```
 
 ```{r}
 
 ## Analysis of receipt data: Texas Republican Party
 
-total_rep_contribs <- rep_contribs %>% 
+## Total receipts: $7,624,398
+
+total_rep_receipts <- rep_receipts %>% 
+    summarise(total = sum(contribution_receipt_amount))
+
+## Grouping by contributor type
+
+con_type_rep_receipts <- rep_receipts %>% 
+  group_by(entity_type_desc) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+## Grouping by contributor
+
+contributor_rep_receipts <- rep_receipts %>% 
   group_by(contributor_name) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
 
-state_rep_contribs <- rep_contribs %>% 
+# What states are the contributions from?
+
+state_rep_receipts <- rep_receipts %>% 
   group_by(contributor_state) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
+
+# What states are the individual contributions from?
+
+ind_state_rep_receipts <- rep_receipts %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+  group_by(contributor_state) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+## What are the individual contributors occupations?
   
-industry_rep_contribs <- rep_contribs %>% 
+industry_rep_receipts <- rep_receipts %>% 
   group_by(contributor_occupation) %>% 
   summarise(total = sum(contribution_receipt_amount)) %>% 
   arrange(desc(total))
 
-count_rep_contribs <- rep_contribs %>% 
+## Which individuals have contributed most often?
+
+count_rep_receipts <- rep_receipts %>% 
   group_by(contributor_name) %>% 
   summarise(count_donations = n()) %>% 
   arrange(desc(count_donations))
 
-type_rep_contribs <- rep_contribs %>% 
+david <- rep_receipts %>% 
+  filter(contributor_name == "AHLQUIST, DAVID")
+
+## Which individual has contributed the most?
+
+most_ind_rep_receipts <- rep_receipts %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+  group_by(contributor_name) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+## What do the individual donations look like?
+
+rep_mean_receipts <- rep_receipts %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+    summarise(mean = mean(contribution_receipt_amount),median = median(contribution_receipt_amount))
+
+## What types of receipts are most relevant?
+
+type_rep_receipts <- rep_receipts %>% 
   group_by(receipt_type_desc) %>% 
   summarise(total = sum(contribution_receipt_amount))
 ```
@@ -119,11 +255,165 @@ type_rep_contribs <- rep_contribs %>%
 ## What do the parties spend their money on?
 
 ```{r}
-clean_dem_disburs
+## Analysis of disbursement data: Texas Democratic Party
+
+## Total disbursements: $5,328,675
+
+total_dem_disburs <- clean_dem_disburs %>% 
+    summarise(total = sum(disbursement_amount))
+
+## Who is the committee paying?
+
+name_dem_disburs <- clean_dem_disburs %>% 
+  group_by(clean_recipient_name, entity_type_desc) %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+  
+## Where are the recipients located?
+
+state_dem_disburs <- clean_dem_disburs %>% 
+  group_by(recipient_state) %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+
+## What types of disbursements are most relevant?
+
+type_dem_disburs <- clean_dem_disburs %>% 
+  group_by(disbursement_description) %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+  
+dem_ads <- clean_dem_disburs %>% 
+  filter(disbursement_description == "DIGITAL ADS-NOT ATTRIBUTABLE TO ANY FEDERAL CANDIDATE")
+
+## Who are the individuals receiving money from the committee?
+
+indi_dem_disburs <- clean_dem_disburs %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+  group_by(clean_recipient_name) %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+  
 ```
 
+```{r}
+## Analysis of disbursement data: Texas Republican Party
 
+## Total disbursements: $6,850,935
+
+total_rep_disburs <- clean_rep_disburs %>% 
+    summarise(total = sum(disbursement_amount))
+
+## Who is the committee paying?
+
+name_rep_disburs <- clean_rep_disburs %>% 
+  group_by(clean_recipient_name, entity_type_desc) %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+
+hilton <- clean_rep_disburs %>% 
+  filter(clean_recipient_name == "HILTON AMERICAS - HOUSTON")
+  
+## Where are the recipients located?
+
+state_rep_disburs <- clean_rep_disburs %>% 
+  group_by(recipient_state) %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+
+## What types of disbursements are most relevant?
+
+type_rep_disburs <- clean_rep_disburs %>% 
+  group_by(disbursement_description) %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+
+category_rep_disburs <- clean_rep_disburs %>% 
+  group_by(category_code_full) %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+  
+## Who are the individuals receiving money from the committee?
+
+indi_rep_disburs <- clean_rep_disburs %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+  group_by(clean_recipient_name) %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+```
 
 ## What are the differences and similarities when comparing the parties?
 
+Republicans raised more money than Democrats, but both received the most from individuals. Both raised most of the donations in Texas, but Democrats got a lot of money from California while D.C. was important to Republicans. The Democrat's biggest donor spent under 30k, while the Republicans received 175 from the biggest donor. Republicans also received bigger donations on average and larger median contributions.
+
+## Chart 1
+
+I want to compare contributor types.
+
+https://datawrapper.dwcdn.net/3IHEA/1/
+
+```{r}
+## Comparing contributor types
+both_con_type <- con_type_dem_receipts %>% 
+  left_join(con_type_rep_receipts, by = "entity_type_desc") %>% 
+  rename(democrats = total.x) %>% 
+  rename(republicans = total.y)
+both_con_type
+
+write_csv(both_con_type, "data/contribution_types.csv")
+
+```
+
+## Chart 2
+
+I want to see which zip codes spend the most on either committees and what their median income is.
+
+https://datawrapper.dwcdn.net/IAQnv/1/
+
+```{r}
+## Get Census data
+
+library(tidycensus)
+census_api_key("832111ee36459ae04b4d63111802dc4c05994a34", install=TRUE)
+
+texas_acs <- get_acs(geography = "zcta",
+              variables = c(medincome = "B19013_001"),
+              state = "TX",
+              year = 2019)
+
+## Get zip level data from committees
+
+dem_zip <- dem_receipts %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+  mutate(zip5 = str_sub(contributor_zip, 1, 5)) %>% 
+  group_by(zip5) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+rep_zip <- rep_receipts %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+    mutate(zip5 = str_sub(contributor_zip, 1, 5)) %>% 
+  group_by(zip5) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+both_zip <- dem_zip %>% 
+  left_join(rep_zip, by = "zip5") %>% 
+  rename(democrats = total.x) %>% 
+  rename (republicans = total.y) %>% 
+  mutate(total_contribs = democrats + republicans)
+
+## Combine
+
+income_zip <- both_zip %>% 
+  left_join(texas_acs, by = c("zip5" = "GEOID")) %>% 
+  arrange(desc(total_contribs)) %>% 
+  top_n(50, total_contribs)
+
+write_csv(income_zip, "data/income_donations.csv")
+```
+
+
 ## What about either donors or spending prompts further questions?
+
+I'm wondering about VLM cooperative inc, as there is hardly any information on them, but they are the Democrat's biggest corporate donor. I would also be interested in exploring the practice of government corporations donating to party campaign. Even if not illegal, that seems at least questionable. I'd also look into the connection between the Hilton hotels and the Texas Republican committee, as they seem to benefit from each other.
